@@ -9,8 +9,8 @@ use std::collections::HashSet;
 
 /// Given a tree graph with bags (HashSets) as Vertices, checks all 2-combinations of bags for non-empty-intersection
 /// and inserts the intersecting nodes in all bags that are along the (unique) path of the two bags in the tree.
-pub fn fill_bags_along_path<E>(
-    mut graph: Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
+pub fn fill_bags_along_paths<E>(
+    graph: &mut Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
 ) {
     let mut vec_of_bags_that_need_to_be_connected: Vec<(NodeIndex, NodeIndex, Vec<NodeIndex>)> =
         Vec::new();
