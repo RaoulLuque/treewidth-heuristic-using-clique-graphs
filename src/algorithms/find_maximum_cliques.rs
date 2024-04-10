@@ -144,7 +144,7 @@ mod tests {
 
     #[test]
     pub fn test_find_maximum_cliques1() {
-        let mut graph: Graph<u32, u32, petgraph::prelude::Undirected> =
+        let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
             petgraph::Graph::new_undirected();
 
         let nodes = [
@@ -207,7 +207,7 @@ mod tests {
 
     #[test]
     fn test_find_maximum_cliques2() {
-        let mut graph: Graph<u32, u32, petgraph::prelude::Undirected> =
+        let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
             petgraph::Graph::new_undirected();
 
         let nodes = [
@@ -256,7 +256,7 @@ mod tests {
 
     #[test]
     pub fn test_find_maximum_cliques_bounded() {
-        let mut graph: Graph<u32, u32, petgraph::prelude::Undirected> =
+        let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
             petgraph::Graph::new_undirected();
 
         let nodes = [

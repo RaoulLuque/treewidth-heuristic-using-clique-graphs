@@ -13,7 +13,7 @@ use petgraph::dot::{Config, Dot};
 use petgraph::Graph;
 
 fn main() {
-    let mut graph: Graph<u32, u32, petgraph::prelude::Undirected> =
+    let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
         petgraph::Graph::new_undirected();
 
     let nodes = [

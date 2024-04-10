@@ -1,10 +1,5 @@
-use itertools::Itertools;
-use petgraph::{
-    graph::NodeIndex,
-    visit::{IntoNeighborsDirected, IntoNodeReferences, NodeRef},
-    Graph,
-};
-use std::collections::{HashSet, VecDeque};
+use petgraph::visit::IntoNeighborsDirected;
+use std::collections::VecDeque;
 use std::hash::Hash;
 
 /// Returns an Option with a vector starting with start and continuing with a path to end, ending with end.
@@ -23,7 +18,6 @@ where
     let mut stack = VecDeque::new();
     stack.push_back((path_so_far.clone(), start));
 
-    let current_vertex = start;
     while let Some((mut path_so_far, current_vertex)) = stack.pop_front() {
         for next_vertex in graph.neighbors(current_vertex) {
             if path_so_far.len() <= 1

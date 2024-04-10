@@ -60,13 +60,11 @@ pub fn fill_bags_along_paths<E>(
 
 #[cfg(test)]
 mod tests {
-    use petgraph::Graph;
-
     use super::*;
 
     #[test]
     fn test() {
-        let mut graph: Graph<u32, u32, petgraph::prelude::Undirected> =
+        let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
             petgraph::Graph::new_undirected();
 
         let nodes = [
@@ -91,7 +89,7 @@ mod tests {
         graph.add_edge(nodes[3], nodes[6], 0);
         graph.add_edge(nodes[4], nodes[6], 0);
 
-        let min_spanning_tree_graph: Graph<u32, u32, petgraph::prelude::Undirected> =
+        let min_spanning_tree_graph: Graph<i32, i32, petgraph::prelude::Undirected> =
             petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(&graph));
     }
 }

@@ -6,12 +6,12 @@ use petgraph::Graph;
 
 pub fn construct_clique_graph<InnerCollection, OuterIterator>(
     cliques: OuterIterator,
-) -> Graph<HashSet<NodeIndex>, u32, petgraph::prelude::Undirected>
+) -> Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected>
 where
     OuterIterator: IntoIterator<Item = InnerCollection>,
     InnerCollection: IntoIterator<Item = NodeIndex>,
 {
-    let mut result_graph: Graph<HashSet<NodeIndex>, u32, petgraph::prelude::Undirected> =
+    let mut result_graph: Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected> =
         Graph::new_undirected();
     for clique in cliques {
         let vertex_index = result_graph.add_node(HashSet::from_iter(clique.into_iter()));
