@@ -11,3 +11,4 @@ description = "A heuristic for calculating an upper bound on treewidth of graphs
 serde = { version = "1.0", features = ["derive"] }
 petgraph = "0.6.4"
 itertools = "0.12.1"
+rand = "0.8.5"
