@@ -24,6 +24,8 @@ pub fn generate_partial_k_tree_with_guaranteed_treewidth(
         if let Some(graph) = generate_partial_k_tree(k, n, p, rng) {
             if maximum_minimum_degree(&graph) == k {
                 return Some(graph);
+            } else {
+                println!("Graph was just discarded");
             }
         } else {
             return None;
@@ -46,13 +48,16 @@ pub fn generate_partial_k_tree(
         // The number of edges in a k-tree
         let number_of_edges = k * (k - 1) / 2 + k * (n - k);
 
+        let number_of_edges_to_be_removed = ((number_of_edges * p) / 100).min(number_of_edges);
         // Remove p percent of nodes
         for edge_to_be_removed in graph
             .edge_indices()
-            .choose_multiple(rng, ((number_of_edges * p) / 100).min(number_of_edges))
+            .choose_multiple(rng, number_of_edges_to_be_removed)
         {
             graph.remove_edge(edge_to_be_removed);
         }
+
+        let remaining_edges = graph.edge_count();
 
         Some(graph)
     } else {
@@ -129,5 +134,21 @@ mod tests {
 
         assert_eq!(max_min_degree_hundred, 100);
         assert_eq!(max_min_degree_twenty_give, 25);
+    }
+
+    #[test]
+    fn test_generate_partial_k_tree_with_guarantee_with_maximum_minimum_degree() {
+        let mut rng = rand::thread_rng();
+        let hundred_tree = generate_partial_k_tree_with_guaranteed_treewidth(10, 200, 10, &mut rng)
+            .expect("k is smaller than n");
+        let twenty_five_tree =
+            generate_partial_k_tree_with_guaranteed_treewidth(10, 500, 20, &mut rng)
+                .expect("k is smaller than n");
+
+        let max_min_degree_hundred = crate::maximum_minimum_degree(&hundred_tree);
+        let max_min_degree_twenty_give = crate::maximum_minimum_degree(&twenty_five_tree);
+
+        assert_eq!(max_min_degree_hundred, 10);
+        assert_eq!(max_min_degree_twenty_give, 10);
     }
 }
