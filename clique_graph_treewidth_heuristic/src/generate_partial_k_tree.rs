@@ -1,7 +1,7 @@
 use petgraph::{graph::NodeIndex, visit::IntoNodeIdentifiers, Graph, Undirected};
 use rand::{seq::IteratorRandom, Rng};
 
-use crate::algorithms::maximum_minimum_degree_heuristic::maximum_minimum_degree;
+use crate::maximum_minimum_degree;
 
 /// Generates a [k-tree](https://en.wikipedia.org/wiki/K-tree) and then randomly removes p percent of the edges
 /// to get a [partial k-tree](https://en.wikipedia.org/wiki/Partial_k-tree). To guarantee a treewidth of k,
@@ -112,9 +112,8 @@ mod tests {
         let complete_graph_twenty_vertices = generate_complete_graph(20);
 
         let max_min_degree_hundred =
-            crate::algorithms::maximum_minimum_degree(&complete_graph_hundred_vertices);
-        let max_min_degree_twenty =
-            crate::algorithms::maximum_minimum_degree(&complete_graph_twenty_vertices);
+            crate::maximum_minimum_degree(&complete_graph_hundred_vertices);
+        let max_min_degree_twenty = crate::maximum_minimum_degree(&complete_graph_twenty_vertices);
 
         assert_eq!(max_min_degree_hundred, 99);
         assert_eq!(max_min_degree_twenty, 19);
@@ -125,9 +124,8 @@ mod tests {
         let hundred_tree = generate_k_tree(100, 150).expect("k is smaller than n");
         let twenty_five_tree = generate_k_tree(25, 100).expect("k is smaller than n");
 
-        let max_min_degree_hundred = crate::algorithms::maximum_minimum_degree(&hundred_tree);
-        let max_min_degree_twenty_give =
-            crate::algorithms::maximum_minimum_degree(&twenty_five_tree);
+        let max_min_degree_hundred = crate::maximum_minimum_degree(&hundred_tree);
+        let max_min_degree_twenty_give = crate::maximum_minimum_degree(&twenty_five_tree);
 
         assert_eq!(max_min_degree_hundred, 100);
         assert_eq!(max_min_degree_twenty_give, 25);

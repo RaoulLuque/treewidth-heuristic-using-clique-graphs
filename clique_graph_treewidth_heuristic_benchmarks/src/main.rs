@@ -1,8 +1,7 @@
-mod algorithms;
 use std::fs;
 use std::io::Write;
 
-use algorithms::{
+use clique_graph_treewidth_heuristic::{
     construct_clique_graph, fill_bags_along_paths, find_maximum_cliques,
     find_width_of_tree_decomposition,
 };

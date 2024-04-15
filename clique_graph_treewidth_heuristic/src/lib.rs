@@ -101,7 +101,7 @@ pub(crate) mod tests {
 
     /// Sets up a Test Graph with:
     ///
-    /// 11 vertices, 13 edges, Treewidth 3 and minimum maximum degree 3
+    /// 6 vertices, 10 edges, Treewidth 3 and minimum maximum degree 3
     pub fn setup_test_graph_two() -> TestGraph {
         let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
             petgraph::Graph::new_undirected();

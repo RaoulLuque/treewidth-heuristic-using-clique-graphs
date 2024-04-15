@@ -141,8 +141,8 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_find_maximum_cliques1() {
-        let test_graph = crate::algorithms::tests::setup_test_graph_one();
+    pub fn test_find_maximum_cliques_test_graph_one() {
+        let test_graph = crate::tests::setup_test_graph_one();
 
         let mut cliques: Vec<Vec<_>> =
             find_maximum_cliques::<Vec<_>, _>(&test_graph.graph).collect();
@@ -156,8 +156,8 @@ mod tests {
     }
 
     #[test]
-    fn test_find_maximum_cliques2() {
-        let test_graph = crate::algorithms::tests::setup_test_graph_one();
+    fn test_find_maximum_cliques_test_graph_two() {
+        let test_graph = crate::tests::setup_test_graph_two();
 
         let mut cliques: Vec<Vec<_>> =
             find_maximum_cliques::<Vec<_>, _>(&test_graph.graph).collect();
@@ -172,7 +172,7 @@ mod tests {
 
     #[test]
     pub fn test_find_maximum_cliques_bounded() {
-        let test_graph = crate::algorithms::tests::setup_test_graph_one();
+        let test_graph = crate::tests::setup_test_graph_one();
 
         let mut cliques: Vec<Vec<_>> =
             find_maximum_cliques_bounded::<Vec<_>, _>(&test_graph.graph, 3).collect();
