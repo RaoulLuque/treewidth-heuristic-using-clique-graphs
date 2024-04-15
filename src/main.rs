@@ -3,9 +3,8 @@ use std::fs;
 use std::io::Write;
 
 use algorithms::{
-    construct_clique_graph::construct_clique_graph, fill_bags_along_paths::fill_bags_along_paths,
-    find_maximum_cliques::find_maximum_cliques,
-    find_width_of_tree_decomposition::find_width_of_tree_decomposition,
+    construct_clique_graph, fill_bags_along_paths, find_maximum_cliques,
+    find_width_of_tree_decomposition,
 };
 use petgraph::dot::{Config, Dot};
 use petgraph::Graph;

@@ -1,10 +1,20 @@
-pub mod construct_clique_graph;
-pub mod fill_bags_along_paths;
-pub mod find_maximum_cliques;
-pub mod find_path_in_tree;
-pub mod find_width_of_tree_decomposition;
-pub mod generate_partial_k_tree;
-pub mod maximum_minimum_degree_heuristic;
+mod construct_clique_graph;
+mod fill_bags_along_paths;
+mod find_maximum_cliques;
+mod find_path_in_tree;
+mod find_width_of_tree_decomposition;
+mod generate_partial_k_tree;
+mod maximum_minimum_degree_heuristic;
+
+pub use construct_clique_graph::construct_clique_graph;
+pub use fill_bags_along_paths::fill_bags_along_paths;
+pub use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
+pub use find_path_in_tree::find_path_in_tree;
+pub use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
+pub use generate_partial_k_tree::{
+    generate_partial_k_tree, generate_partial_k_tree_with_guaranteed_treewidth,
+};
+pub use maximum_minimum_degree_heuristic::maximum_minimum_degree;
 
 #[cfg(test)]
 pub(crate) mod tests {

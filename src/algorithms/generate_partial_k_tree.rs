@@ -1,7 +1,7 @@
 use petgraph::{graph::NodeIndex, visit::IntoNodeIdentifiers, Graph, Undirected};
 use rand::{seq::IteratorRandom, Rng};
 
-use crate::algorithms::maximum_minimum_degree_heuristic::maximum_minimum_degree_heuristic;
+use crate::algorithms::maximum_minimum_degree_heuristic::maximum_minimum_degree;
 
 /// Generates a [k-tree](https://en.wikipedia.org/wiki/K-tree) and then randomly removes p percent of the edges
 /// to get a [partial k-tree](https://en.wikipedia.org/wiki/Partial_k-tree). To guarantee a treewidth of k,
@@ -22,7 +22,7 @@ pub fn generate_partial_k_tree_with_guaranteed_treewidth(
 ) -> Option<Graph<i32, i32, Undirected>> {
     loop {
         if let Some(graph) = generate_partial_k_tree(k, n, p, rng) {
-            if maximum_minimum_degree_heuristic(&graph) == k {
+            if maximum_minimum_degree(&graph) == k {
                 return Some(graph);
             }
         } else {
@@ -83,19 +83,53 @@ fn generate_k_tree(k: usize, n: usize) -> Option<Graph<i32, i32, Undirected>> {
     }
 }
 
+/// Generates a [complete graph](https://en.wikipedia.org/wiki/Complete_graph) with k vertices
+/// and k * (k-1) / 2 edges
 fn generate_complete_graph(k: usize) -> Graph<i32, i32, Undirected> {
     let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
         petgraph::Graph::new_undirected();
 
     // Add k nodes to the graph
-    let nodes: Vec<NodeIndex> = (0..k + 1).map(|_| graph.add_node(0)).collect();
+    let nodes: Vec<NodeIndex> = (0..k).map(|_| graph.add_node(0)).collect();
 
     // Connect each node to every other node
-    for i in 0..k + 1 {
-        for j in i + 1..k + 1 {
+    for i in 0..k {
+        for j in i + 1..k {
             graph.add_edge(nodes[i], nodes[j], 0);
         }
     }
 
     graph
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_complete_graph_with_maximum_minimum_degree() {
+        let complete_graph_hundred_vertices = generate_complete_graph(100);
+        let complete_graph_twenty_vertices = generate_complete_graph(20);
+
+        let max_min_degree_hundred =
+            crate::algorithms::maximum_minimum_degree(&complete_graph_hundred_vertices);
+        let max_min_degree_twenty =
+            crate::algorithms::maximum_minimum_degree(&complete_graph_twenty_vertices);
+
+        assert_eq!(max_min_degree_hundred, 99);
+        assert_eq!(max_min_degree_twenty, 19);
+    }
+
+    #[test]
+    fn test_generate_k_tree_with_maximum_minimum_degree() {
+        let hundred_tree = generate_k_tree(100, 150).expect("k is smaller than n");
+        let twenty_five_tree = generate_k_tree(25, 100).expect("k is smaller than n");
+
+        let max_min_degree_hundred = crate::algorithms::maximum_minimum_degree(&hundred_tree);
+        let max_min_degree_twenty_give =
+            crate::algorithms::maximum_minimum_degree(&twenty_five_tree);
+
+        assert_eq!(max_min_degree_hundred, 100);
+        assert_eq!(max_min_degree_twenty_give, 25);
+    }
 }
