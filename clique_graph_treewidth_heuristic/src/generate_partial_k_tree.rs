@@ -57,8 +57,6 @@ pub fn generate_partial_k_tree(
             graph.remove_edge(edge_to_be_removed);
         }
 
-        let remaining_edges = graph.edge_count();
-
         Some(graph)
     } else {
         None

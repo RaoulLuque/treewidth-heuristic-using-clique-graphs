@@ -59,37 +59,4 @@ pub fn fill_bags_along_paths<E>(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test() {
-        let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
-            petgraph::Graph::new_undirected();
-
-        let nodes = [
-            graph.add_node(0),
-            graph.add_node(0),
-            graph.add_node(0),
-            graph.add_node(0),
-            graph.add_node(0),
-            graph.add_node(0),
-            graph.add_node(0),
-        ];
-
-        graph.add_edge(nodes[0], nodes[1], 0);
-        graph.add_edge(nodes[0], nodes[2], 0);
-        graph.add_edge(nodes[0], nodes[5], 0);
-        graph.add_edge(nodes[1], nodes[2], 0);
-        graph.add_edge(nodes[1], nodes[3], 0);
-        graph.add_edge(nodes[1], nodes[5], 0);
-        graph.add_edge(nodes[2], nodes[5], 0);
-        graph.add_edge(nodes[3], nodes[4], 0);
-        graph.add_edge(nodes[3], nodes[5], 0);
-        graph.add_edge(nodes[3], nodes[6], 0);
-        graph.add_edge(nodes[4], nodes[6], 0);
-
-        let min_spanning_tree_graph: Graph<i32, i32, petgraph::prelude::Undirected> =
-            petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(&graph));
-    }
-}
+mod tests {}
