@@ -1,11 +1,7 @@
-use petgraph::{
-    graph::NodeIndex,
-    visit::{IntoEdgeReferences, IntoEdges, IntoNodeIdentifiers},
-    Graph, Undirected,
-};
+use petgraph::{graph::NodeIndex, visit::IntoNodeIdentifiers, Graph, Undirected};
 use rand::{seq::IteratorRandom, Rng};
 
-use crate::algorithms::minimum_maximum_degree_heuristic::minimum_maximum_degree_heuristic;
+use crate::algorithms::maximum_minimum_degree_heuristic::maximum_minimum_degree_heuristic;
 
 /// Generates a [k-tree](https://en.wikipedia.org/wiki/K-tree) and then randomly removes p percent of the edges
 /// to get a [partial k-tree](https://en.wikipedia.org/wiki/Partial_k-tree). To guarantee a treewidth of k,
@@ -25,8 +21,8 @@ pub fn generate_partial_k_tree_with_guaranteed_treewidth(
     rng: &mut impl Rng,
 ) -> Option<Graph<i32, i32, Undirected>> {
     loop {
-        if let Some(mut graph) = generate_partial_k_tree(k, n, p, rng) {
-            if minimum_maximum_degree_heuristic(&graph) == k {
+        if let Some(graph) = generate_partial_k_tree(k, n, p, rng) {
+            if maximum_minimum_degree_heuristic(&graph) == k {
                 return Some(graph);
             }
         } else {

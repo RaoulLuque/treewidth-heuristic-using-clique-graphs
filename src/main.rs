@@ -1,6 +1,4 @@
 mod algorithms;
-use core::fmt;
-use std::fmt::Debug;
 use std::fs;
 use std::io::Write;
 
@@ -50,7 +48,8 @@ fn main() {
     let start_graph_dot_file = Dot::with_config(&graph, &[Config::EdgeNoLabel]);
     let result_graph_dot_file = Dot::with_config(&clique_graph, &[Config::EdgeNoLabel]);
 
-    fs::create_dir_all("target/visualizations");
+    fs::create_dir_all("target/visualizations")
+        .expect("Could not create directory for visualizations");
     fs::write(
         "target/visualizations/starting_graph.dot",
         start_graph_dot_file.to_string(),

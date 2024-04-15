@@ -1,6 +1,6 @@
 use petgraph::{visit::IntoNodeIdentifiers, Graph, Undirected};
 
-pub fn minimum_maximum_degree_heuristic<N: Clone, E: Clone>(
+pub fn maximum_minimum_degree_heuristic<N: Clone, E: Clone>(
     graph: &Graph<N, E, Undirected>,
 ) -> usize {
     let mut max_min = 0;
