@@ -38,7 +38,7 @@ pub(crate) mod tests {
 
     /// Sets up a Test Graph with:
     ///
-    /// 11 vertices, 13 edges, Treewidth 3 and minimum maximum degree 3
+    /// 11 vertices, 13 edges, Treewidth 3 and maximum minimum degree 3
     pub fn setup_test_graph_one() -> TestGraph {
         let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
             petgraph::Graph::new_undirected();
@@ -101,7 +101,7 @@ pub(crate) mod tests {
 
     /// Sets up a Test Graph with:
     ///
-    /// 6 vertices, 10 edges, Treewidth 3 and minimum maximum degree 3
+    /// 6 vertices, 10 edges, Treewidth 3 and maximum minimum degree 3
     pub fn setup_test_graph_two() -> TestGraph {
         let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
             petgraph::Graph::new_undirected();
@@ -128,6 +128,53 @@ pub(crate) mod tests {
 
         let expected_max_cliques: Vec<Vec<_>> =
             vec![vec![1, 2], vec![1, 4, 5, 6], vec![2, 3], vec![3, 4, 6]];
+        let mut expected_max_cliques: Vec<Vec<_>> = expected_max_cliques
+            .into_iter()
+            .map(|v| {
+                v.into_iter()
+                    .map(|e| petgraph::graph::node_index(e - 1))
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        for i in 0..expected_max_cliques.len() {
+            expected_max_cliques[i].sort();
+        }
+        expected_max_cliques.sort();
+
+        TestGraph {
+            graph,
+            treewidth: 3,
+            expected_max_cliques,
+            max_min_degree: 3,
+        }
+    }
+
+    /// Sets up a Test Graph with:
+    ///
+    /// 5 vertices, 9 edges, Treewidth 3 and maximum minimum degree 3
+    pub fn setup_test_graph_three() -> TestGraph {
+        let mut graph: Graph<i32, i32, petgraph::prelude::Undirected> =
+            petgraph::Graph::new_undirected();
+
+        let nodes = [
+            graph.add_node(0),
+            graph.add_node(0),
+            graph.add_node(0),
+            graph.add_node(0),
+            graph.add_node(0),
+        ];
+
+        graph.add_edge(nodes[0], nodes[1], 0);
+        graph.add_edge(nodes[0], nodes[2], 0);
+        graph.add_edge(nodes[0], nodes[3], 0);
+        graph.add_edge(nodes[1], nodes[2], 0);
+        graph.add_edge(nodes[1], nodes[3], 0);
+        graph.add_edge(nodes[1], nodes[4], 0);
+        graph.add_edge(nodes[2], nodes[3], 0);
+        graph.add_edge(nodes[2], nodes[4], 0);
+        graph.add_edge(nodes[3], nodes[4], 0);
+
+        let expected_max_cliques: Vec<Vec<_>> = vec![vec![1, 2, 3, 4], vec![2, 3, 4, 5]];
         let mut expected_max_cliques: Vec<Vec<_>> = expected_max_cliques
             .into_iter()
             .map(|v| {

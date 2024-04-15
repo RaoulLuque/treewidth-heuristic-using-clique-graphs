@@ -107,6 +107,10 @@ where
     })
 }
 
+/// Returns an iterator that produces all maximum cliques with maximum size k or cliques that are
+/// part of maximum cliques that are themselves bigger in size than k in arbitrary order.
+///
+/// Uses the [find_maximum_cliques] method.
 pub fn find_maximum_cliques_bounded<TargetColl, G>(
     graph: G,
     k: usize,
@@ -115,15 +119,20 @@ where
     G: NodeCount,
     G: IntoNeighborsDirected,
     G: IntoNodeIdentifiers,
-    G::NodeId: Eq + Hash,
+    G::NodeId: Eq + Hash + Ord,
     TargetColl: FromIterator<G::NodeId>,
     <G as GraphBase>::NodeId: 'static,
 {
     let mut maximum_cliques = find_maximum_cliques::<HashSet<_>, G>(graph);
-    let mut combinations: Combinations<_> = HashSet::new().into_iter().combinations(k);
+    let mut combinations = HashSet::new().into_iter().combinations(k);
+    let mut seen_combinations = HashSet::new();
     from_fn(move || loop {
-        if let Some(clique_combination) = combinations.next() {
-            return Some(clique_combination.into_iter().collect::<TargetColl>());
+        if let Some(mut clique_combination) = combinations.next() {
+            clique_combination.sort();
+            if seen_combinations.insert(clique_combination.clone()) {
+                // Only insert combination if it hasn't been seen yet (remove duplicate combinations)
+                return Some(clique_combination.into_iter().collect::<TargetColl>());
+            }
         } else if let Some(clique) = maximum_cliques.next() {
             if clique.len() <= k {
                 return Some(clique.into_iter().collect::<TargetColl>());
@@ -171,6 +180,21 @@ mod tests {
     }
 
     #[test]
+    fn test_find_maximum_cliques_test_graph_three() {
+        let test_graph = crate::tests::setup_test_graph_three();
+
+        let mut cliques: Vec<Vec<_>> =
+            find_maximum_cliques::<Vec<_>, _>(&test_graph.graph).collect();
+
+        for i in 0..cliques.len() {
+            cliques[i].sort();
+        }
+        cliques.sort();
+
+        assert_eq!(cliques, test_graph.expected_max_cliques);
+    }
+
+    #[test]
     pub fn test_find_maximum_cliques_bounded() {
         let test_graph = crate::tests::setup_test_graph_one();
 
@@ -192,6 +216,41 @@ mod tests {
             vec![8, 9],
             vec![10, 11],
         ];
+        let mut expected_bounded_max_cliques: Vec<Vec<_>> = expected_bounded_max_cliques
+            .into_iter()
+            .map(|v| {
+                v.into_iter()
+                    .map(|e| petgraph::graph::node_index(e - 1))
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        for i in 0..expected_bounded_max_cliques.len() {
+            expected_bounded_max_cliques[i].sort();
+        }
+        expected_bounded_max_cliques.sort();
+
+        assert_eq!(cliques, expected_bounded_max_cliques);
+
+        let test_graph = crate::tests::setup_test_graph_three();
+
+        let mut cliques: Vec<Vec<_>> =
+            find_maximum_cliques_bounded::<Vec<_>, _>(&test_graph.graph, 3).collect();
+
+        for i in 0..cliques.len() {
+            cliques[i].sort();
+        }
+        cliques.sort();
+
+        let expected_bounded_max_cliques: Vec<Vec<_>> = vec![
+            vec![1, 2, 3],
+            vec![1, 2, 4],
+            vec![1, 3, 4],
+            vec![2, 3, 4],
+            vec![2, 3, 5],
+            vec![2, 4, 5],
+            vec![3, 4, 5],
+        ];
+
         let mut expected_bounded_max_cliques: Vec<Vec<_>> = expected_bounded_max_cliques
             .into_iter()
             .map(|v| {
