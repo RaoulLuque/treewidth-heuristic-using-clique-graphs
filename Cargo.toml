@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "clique_graph_treewidth_heuristic",
-    "clique_graph_treewidth_heuristic_benchmarks"
+    "treewidth_heuristic",
+    "benchmarks"
 ]
 resolver = "2"

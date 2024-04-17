@@ -3,28 +3,19 @@
 version = 3
 
 [[package]]
+name = "benchmarks"
+version = "0.1.0"
+dependencies = [
+ "petgraph",
+ "serde",
+ "treewidth_heuristic",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
-
-[[package]]
-name = "clique_graph_treewidth_heuristic"
-version = "0.1.0"
-dependencies = [
- "itertools",
- "petgraph",
- "rand",
-]
-
-[[package]]
-name = "clique_graph_treewidth_heuristic_benchmarks"
-version = "0.1.0"
-dependencies = [
- "clique_graph_treewidth_heuristic",
- "petgraph",
- "serde",
-]
 
 [[package]]
 name = "either"
@@ -179,6 +170,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "treewidth_heuristic"
+version = "0.1.0"
+dependencies = [
+ "itertools",
+ "petgraph",
+ "rand",
 ]
 
 [[package]]
