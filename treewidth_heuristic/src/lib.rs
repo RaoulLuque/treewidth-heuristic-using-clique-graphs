@@ -18,6 +18,7 @@ pub use maximum_minimum_degree_heuristic::maximum_minimum_degree;
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use super::*;
     use petgraph::{graph::NodeIndex, Graph};
 
     /// Struct for TestGraphs with necessary info for testing different functionalities
@@ -194,5 +195,76 @@ pub(crate) mod tests {
             expected_max_cliques,
             max_min_degree: 3,
         }
+    }
+
+    #[test]
+    fn test_treewidth_heuristic_on_test_graph_one() {
+        let test_graph = setup_test_graph_one();
+        let graph = test_graph.graph;
+        let cliques: Vec<Vec<_>> = find_maximum_cliques::<Vec<_>, _>(&graph).collect();
+        let clique_graph: Graph<
+            std::collections::HashSet<petgraph::prelude::NodeIndex>,
+            i32,
+            petgraph::prelude::Undirected,
+        > = construct_clique_graph(cliques);
+        let mut clique_graph_tree: Graph<
+            std::collections::HashSet<petgraph::prelude::NodeIndex>,
+            i32,
+            petgraph::prelude::Undirected,
+        > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
+            &clique_graph,
+        ));
+        fill_bags_along_paths(&mut clique_graph_tree);
+        let computed_treewidth = find_width_of_tree_decomposition(&clique_graph_tree);
+
+        assert_eq!(computed_treewidth, test_graph.treewidth);
+    }
+
+    #[test]
+    fn test_treewidth_heuristic_on_test_graph_two() {
+        let test_graph = setup_test_graph_two();
+        let graph = test_graph.graph;
+        let cliques: Vec<Vec<_>> = find_maximum_cliques::<Vec<_>, _>(&graph).collect();
+        let clique_graph: Graph<
+            std::collections::HashSet<petgraph::prelude::NodeIndex>,
+            i32,
+            petgraph::prelude::Undirected,
+        > = construct_clique_graph(cliques);
+        let mut clique_graph_tree: Graph<
+            std::collections::HashSet<petgraph::prelude::NodeIndex>,
+            i32,
+            petgraph::prelude::Undirected,
+        > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
+            &clique_graph,
+        ));
+        println!("{:?}", clique_graph);
+        println!("{:?}", clique_graph_tree);
+        fill_bags_along_paths(&mut clique_graph_tree);
+        let computed_treewidth = find_width_of_tree_decomposition(&clique_graph_tree);
+        // TO DO: Write heuristic that "fixes" the computed treewidth in this  case
+        assert_eq!(computed_treewidth, test_graph.treewidth + 1);
+    }
+
+    #[test]
+    fn test_treewidth_heuristic_on_test_graph_three() {
+        let test_graph = setup_test_graph_three();
+        let graph = test_graph.graph;
+        let cliques: Vec<Vec<_>> = find_maximum_cliques::<Vec<_>, _>(&graph).collect();
+        let clique_graph: Graph<
+            std::collections::HashSet<petgraph::prelude::NodeIndex>,
+            i32,
+            petgraph::prelude::Undirected,
+        > = construct_clique_graph(cliques);
+        let mut clique_graph_tree: Graph<
+            std::collections::HashSet<petgraph::prelude::NodeIndex>,
+            i32,
+            petgraph::prelude::Undirected,
+        > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
+            &clique_graph,
+        ));
+        fill_bags_along_paths(&mut clique_graph_tree);
+        let computed_treewidth = find_width_of_tree_decomposition(&clique_graph_tree);
+
+        assert_eq!(computed_treewidth, test_graph.treewidth);
     }
 }
