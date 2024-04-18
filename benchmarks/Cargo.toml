@@ -7,8 +7,16 @@ authors = ["Raoul Luque <raoulsluque@gmail.com>"]
 description = "Benchmarks for a heuristic for calculating an upper bound on treewidth of graphs using clique-graphs"
 repository = "https://github.com/RaoulLuque/treewidth-heuristic-clique-graph"
 
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 3
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 petgraph = "0.6.4"
 treewidth_heuristic = { path = "../treewidth_heuristic", version = "0.1.0" }
+dimacs_petgraph_parser = { git = "https://github.com/RaoulLuque/dimacs-petgraph-parser" }
