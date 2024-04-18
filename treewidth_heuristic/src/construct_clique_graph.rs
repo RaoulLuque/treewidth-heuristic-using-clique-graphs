@@ -4,6 +4,9 @@ use petgraph::graph::NodeIndex;
 use petgraph::visit::IntoNodeReferences;
 use petgraph::Graph;
 
+/// Constructs a clique graph given cliques of a graph.
+/// The clique graph consists of vertices which represent the cliques (bags)
+/// and edges that connect two vertices if the intersection of the corresponding cliques is not empty.
 pub fn construct_clique_graph<InnerCollection, OuterIterator>(
     cliques: OuterIterator,
 ) -> Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected>
