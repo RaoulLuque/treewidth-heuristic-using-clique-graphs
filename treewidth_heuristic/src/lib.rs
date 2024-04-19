@@ -1,5 +1,6 @@
 mod construct_clique_graph;
 mod fill_bags_along_paths;
+mod find_connected_components;
 mod find_maximum_cliques;
 mod find_path_in_tree;
 mod find_width_of_tree_decomposition;
@@ -8,6 +9,7 @@ mod maximum_minimum_degree_heuristic;
 
 pub use construct_clique_graph::construct_clique_graph;
 pub use fill_bags_along_paths::fill_bags_along_paths;
+pub use find_connected_components::find_connected_components;
 pub use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
 pub use find_path_in_tree::find_path_in_tree;
 pub use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
@@ -35,6 +37,7 @@ pub(crate) mod tests {
         pub treewidth: usize,
         pub expected_max_cliques: Vec<Vec<NodeIndex>>,
         pub max_min_degree: usize,
+        pub expected_connected_components: Vec<Vec<NodeIndex>>,
     }
 
     /// Sets up a Test Graph with:
@@ -92,11 +95,27 @@ pub(crate) mod tests {
         }
         expected_max_cliques.sort();
 
+        let expected_connected_components =
+            vec![vec![1, 2, 3, 4, 5, 6, 7], vec![8, 9], vec![10, 11]];
+        let mut expected_connected_components: Vec<Vec<_>> = expected_connected_components
+            .into_iter()
+            .map(|v| {
+                v.into_iter()
+                    .map(|e| petgraph::graph::node_index(e - 1))
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        for i in 0..expected_connected_components.len() {
+            expected_connected_components[i].sort();
+        }
+        expected_connected_components.sort();
+
         TestGraph {
             graph,
             treewidth: 3,
             expected_max_cliques,
             max_min_degree: 3,
+            expected_connected_components,
         }
     }
 
@@ -142,11 +161,26 @@ pub(crate) mod tests {
         }
         expected_max_cliques.sort();
 
+        let expected_connected_components = vec![vec![1, 2, 3, 4, 5, 6]];
+        let mut expected_connected_components: Vec<Vec<_>> = expected_connected_components
+            .into_iter()
+            .map(|v| {
+                v.into_iter()
+                    .map(|e| petgraph::graph::node_index(e - 1))
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        for i in 0..expected_connected_components.len() {
+            expected_connected_components[i].sort();
+        }
+        expected_connected_components.sort();
+
         TestGraph {
             graph,
             treewidth: 3,
             expected_max_cliques,
             max_min_degree: 3,
+            expected_connected_components,
         }
     }
 
@@ -189,11 +223,26 @@ pub(crate) mod tests {
         }
         expected_max_cliques.sort();
 
+        let expected_connected_components = vec![vec![1, 2, 3, 4, 5]];
+        let mut expected_connected_components: Vec<Vec<_>> = expected_connected_components
+            .into_iter()
+            .map(|v| {
+                v.into_iter()
+                    .map(|e| petgraph::graph::node_index(e - 1))
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        for i in 0..expected_connected_components.len() {
+            expected_connected_components[i].sort();
+        }
+        expected_connected_components.sort();
+
         TestGraph {
             graph,
             treewidth: 3,
             expected_max_cliques,
             max_min_degree: 3,
+            expected_connected_components,
         }
     }
 
