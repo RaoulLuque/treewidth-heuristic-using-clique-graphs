@@ -1,4 +1,4 @@
-use itertools::{Combinations, Itertools};
+use itertools::Itertools;
 use petgraph::visit::{GraphBase, IntoNeighborsDirected, IntoNodeIdentifiers, NodeCount};
 use std::iter::from_fn;
 use std::{collections::HashSet, hash::Hash};
