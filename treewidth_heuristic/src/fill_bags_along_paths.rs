@@ -1,15 +1,16 @@
 use itertools::Itertools;
+use log::info;
 use petgraph::{
+    algo::Measure,
     graph::NodeIndex,
     visit::{IntoNodeReferences, NodeRef},
     Graph,
 };
 use std::collections::HashSet;
-use log::info;
 
 /// Given a tree graph with bags (HashSets) as Vertices, checks all 2-combinations of bags for non-empty-intersection
 /// and inserts the intersecting nodes in all bags that are along the (unique) path of the two bags in the tree.
-pub fn fill_bags_along_paths<E>(
+pub fn fill_bags_along_paths<E: Copy + Measure + Default>(
     graph: &mut Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
 ) {
     let mut vec_of_bags_that_need_to_be_connected: Vec<(NodeIndex, NodeIndex, Vec<NodeIndex>)> =
@@ -36,16 +37,27 @@ pub fn fill_bags_along_paths<E>(
     info!("Filling up bags");
     // Filling up the bags along the paths of the vertices
     for (first_id, second_id, intersection_vec) in vec_of_bags_that_need_to_be_connected {
-        // let mut path = find_path_in_tree::<
+        // let mut path = crate::find_path_in_tree::<
         //     &Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
         //     Vec<_>,
         // >(&graph, first_id, second_id)
         // .expect("Paths should exist between all 2 vertices in a tree");
+
         let mut path: Vec<_> = petgraph::algo::simple_paths::all_simple_paths::<Vec<NodeIndex>, _>(
             &*graph, first_id, second_id, 0, None,
         )
         .next()
         .expect("There should be a path in the tree");
+
+        // let mut path = petgraph::algo::astar(
+        //     &*graph,
+        //     first_id,
+        //     |f| f == second_id,
+        //     |e| *e.weight(),
+        //     |_| E::default(),
+        // )
+        // .expect("There should be a path in the tree")
+        // .1;
 
         // Last element is the given end node
         path.pop();

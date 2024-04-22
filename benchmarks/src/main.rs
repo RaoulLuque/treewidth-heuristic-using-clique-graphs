@@ -3,6 +3,7 @@ use std::fs::{self, File};
 use std::io::Write;
 
 use petgraph::Graph;
+use std::time::SystemTime;
 use treewidth_heuristic::compute_treewidth_upper_bound_not_connected;
 
 fn main() {
@@ -25,11 +26,22 @@ fn main() {
                         read_graph(graph_file).expect("Graph should be in correct format");
 
                     println!("Starting calculation on graph: {:?}", graph_file_name);
+                    // Time the calculation
+                    let start = SystemTime::now();
                     let computed_treewidth = compute_treewidth_upper_bound_not_connected(&graph);
 
                     dimacs_log_file
                         .write_all(
-                            format!("{:?}: {} \n", graph_file_name, computed_treewidth).as_bytes(),
+                            format!(
+                                "{:?}: {} took {:.3} milliseconds\n",
+                                graph_file_name,
+                                computed_treewidth,
+                                start
+                                    .elapsed()
+                                    .expect("Time should be trackable")
+                                    .as_millis()
+                            )
+                            .as_bytes(),
                         )
                         .expect("Writing to Dimacs log file should be possible");
                 }
