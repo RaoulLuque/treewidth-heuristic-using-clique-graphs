@@ -1,0 +1,57 @@
+Last Update December 13
+  -rw-r-----  1 trick       63466 Dec 13 11:22 DSJC1000.1.col.b
+  -rw-r-----  1 trick       63467 Dec 13 11:22 DSJC1000.5.col.b
+  -rw-r-----  1 trick       63467 Dec 13 11:22 DSJC1000.9.col.b
+  -rw-r-----  1 trick        1503 Dec 13 11:22 DSJC125.1.col.b
+  -rw-r-----  1 trick        1503 Dec 13 11:22 DSJC125.5.col.b
+  -rw-r-----  1 trick        1504 Dec 13 11:22 DSJC125.9.col.b
+  -rw-r-----  1 trick        4495 Dec 13 11:22 DSJC250.1.col.b
+  -rw-r-----  1 trick        4496 Dec 13 11:22 DSJC250.5.col.b
+  -rw-r-----  1 trick        4496 Dec 13 11:22 DSJC250.9.col.b
+  -rw-r-----  1 trick       16340 Dec 13 11:22 DSJC500.1.col.b
+  -rw-r-----  1 trick       16341 Dec 13 11:22 DSJC500.5.col.b
+  -rw-r-----  1 trick       16341 Dec 13 11:22 DSJC500.9.col.b
+  -rw-r-----  1 trick       16652 Dec 13 11:22 DSJR500.1.col.b
+  -rw-r-----  1 trick       16655 Dec 13 11:22 DSJR500.1c.col.b
+  -rw-r-----  1 trick       16654 Dec 13 11:22 DSJR500.5.col.b
+
+Last Update November 28
+  -rw-r--r--  1 trick       63439 Nov 28 08:34 flat1000_50_0.col.b
+  -rw-r--r--  1 trick       63440 Nov 28 08:34 flat1000_60_0.col.b
+  -rw-r--r--  1 trick       63441 Nov 28 08:34 flat1000_76_0.col.b
+  -rw-r--r--  1 trick        6214 Nov 28 08:35 flat300_20_0.col.b
+  -rw-r--r--  1 trick        6214 Nov 28 08:35 flat300_26_0.col.b
+  -rw-r--r--  1 trick        6214 Nov 28 08:35 flat300_28_0.col.b
+  -rw-r--r--  1 trick      180931 Nov 28 08:59 school1.col
+  -rw-r--r--  1 trick      137498 Nov 28 08:59 school1_nsh.col
+  -rw-r--r--  1 trick     2999870 Nov 28 08:59 latin_square_10.col
+
+Last Update September 19
+  -rw-------  1 trick      106164 Sep 19 10:05 fpsol2.i.1.col
+  -rw-------  1 trick       76640 Sep 19 10:05 fpsol2.i.2.col
+  -rw-------  1 trick       76610 Sep 19 10:05 fpsol2.i.3.col
+  -rw-------  1 trick      166511 Sep 19 10:05 inithx.i.1.col
+  -rw-------  1 trick      122688 Sep 19 10:05 inithx.i.2.col
+  -rw-------  1 trick      122560 Sep 19 10:05 inithx.i.3.col
+
+Last Update July 11
+  -rw-r--r--  1 trick       78818 Jul 11 15:22 le450_15a.col
+  -rw-r--r--  1 trick       78938 Jul 11 15:22 le450_15b.col
+  -rw-r--r--  1 trick      159925 Jul 11 15:22 le450_15c.col
+  -rw-r--r--  1 trick      160613 Jul 11 15:22 le450_15d.col
+  -rw-r--r--  1 trick       79877 Jul 11 15:22 le450_25a.col
+  -rw-r--r--  1 trick       79743 Jul 11 15:22 le450_25b.col
+  -rw-r--r--  1 trick      166375 Jul 11 15:22 le450_25c.col
+  -rw-r--r--  1 trick      166639 Jul 11 15:22 le450_25d.col
+  -rw-r--r--  1 trick       55501 Jul 11 15:23 le450_5a.col
+  -rw-r--r--  1 trick       55589 Jul 11 15:23 le450_5b.col
+  -rw-r--r--  1 trick       94368 Jul 11 15:23 le450_5c.col
+  -rw-r--r--  1 trick       93979 Jul 11 15:23 le450_5d.col
+  -rw-r--r--  1 trick       33225 Jul 11 15:23 mulsol.i.1.col
+  -rw-r--r--  1 trick       32612 Jul 11 15:23 mulsol.i.2.col
+  -rw-r--r--  1 trick       32861 Jul 11 15:23 mulsol.i.3.col
+  -rw-r--r--  1 trick       33130 Jul 11 15:23 mulsol.i.4.col
+  -rw-r--r--  1 trick       33369 Jul 11 15:23 mulsol.i.5.col
+  -rw-r--r--  1 trick       34727 Jul 11 15:23 zeroin.i.1.col
+  -rw-r--r--  1 trick       29840 Jul 11 15:23 zeroin.i.2.col
+  -rw-r--r--  1 trick       29808 Jul 11 15:23 zeroin.i.3.col

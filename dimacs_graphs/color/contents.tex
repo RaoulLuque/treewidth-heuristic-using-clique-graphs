@@ -1,0 +1,96 @@
+\documentstyle[12pt,supertab]{article}
+\begin{document}
+\tablefirsthead{\hline\multicolumn{5}{|c|}{DIMACS COLORING
+BENCHMARKS}\\\hline File&Code&Nodes&Edges&Colors Needed\\\hline}
+\tablehead{\hline\multicolumn{5}{|c|}{DIMACS COLORING
+BENCHMARKS (cont.)}\\\hline File&Code&Nodes&Edges&Colors Needed\\\hline}
+\tabletail{\hline\multicolumn{5}{|r|}{\it Continued on next
+page}\\\hline}
+\tablelasttail{\hline}
+\begin{supertabular}{|lc|rr|c|}
+mulsol.i.1.col&(Reg)&197&3925&\\
+mulsol.i.2.col&(Reg)&188&3885&\\
+mulsol.i.3.col&(Reg)&184&3916&\\
+mulsol.i.4.col&(Reg)&185&3946&\\
+mulsol.i.5.col&(Reg)&186&3973&\\
+zeroin.i.1.col&(Reg)&211&4100&\\
+zeroin.i.2.col&(Reg)&211&3541&\\
+zeroin.i.3.col&(Reg)&206&3540&\\
+fpsol2.i.1.col&(Reg)&496 &11654 & \\
+fpsol2.i.2.col&(Reg)&451 &8691 & \\
+fpsol2.i.3.col&(Reg)&425 &8688 & \\
+inithx.i.1.col&(Reg)&864 &18707 & \\
+inithx.i.2.col&(Reg)&645 &13979 & \\
+inithx.i.3.col&(Reg)&621 &13969 & \\
+le450\_15a.col&(Lei)&450&8168&15\\
+le450\_15b.col&(Lei)&450&8169&15\\
+le450\_15c.col&(Lei)&450&16680&15\\
+le450\_15d.col&(Lei)&450&16750&15\\
+le450\_25a.col&(Lei)&450&8260&25\\
+le450\_25b.col&(Lei)&450&8263&25\\
+le450\_25c.col&(Lei)&450&17343&25\\
+le450\_25d.col&(Lei)&450&17425&25\\
+le450\_5a.col&(Lei)&450&5714&5\\
+le450\_5b.col&(Lei)&450&5734&5\\
+le450\_5c.col&(Lei)&450&9803&5\\
+le450\_5d.col&(Lei)&450&9757&5\\
+flat1000\_50\_0.col.b&(Cul)&1000&245000&50\\
+flat1000\_60\_0.col.b&(Cul)&1000&245830&60\\
+flat1000\_76\_0.col.b&(Cul)&1000&246708&76\\
+flat300\_20\_0.col.b&(Cul)&300&21375&20\\
+flat300\_26\_0.col.b&(Cul)&300&21633&26\\
+flat300\_28\_0.col.b&(Cul)&300&21695&28\\
+school1.col&(Sch)&385&19095& \\
+school1\_nsh.col&(Sch)&352&14612& \\
+latin\_square\_10.col&(Lat)&900&307350& \\
+DSJC1000.1.col.b&(DSJ)&1000&99258 & \\
+DSJC1000.5.col.b&(DSJ)&1000&499652 & \\
+DSJC1000.9.col.b&(DSJ)&1000&898898 & \\
+DSJC125.1.col.b&(DSJ)&1000&1472 & \\
+DSJC125.5.col.b&(DSJ)&1000&7782 & \\
+DSJC125.9.col.b&(DSJ)&1000&13922 & \\
+DSJC250.1.col.b&(DSJ)&1000&6436 & \\
+DSJC250.5.col.b&(DSJ)&1000&31336 & \\
+DSJC250.9.col.b&(DSJ)&1000&55794 & \\
+DSJC500.1.col.b&(DSJ)&1000&24916 & \\
+DSJC500.5.col.b&(DSJ)&1000&125248 & \\
+DSJC500.9.col.b&(DSJ)&1000&224874 & \\
+DSJR500.1.col.b&(DSJ)&1000&7110 & \\
+DSJR500.1c.col.b&(DSJ)&1000&242550 & \\
+DSJR500.5.col.b&(DSJ)&1000&117724 & \\
+\end{supertabular}
+\bigskip
+\noindent {\bf Notes:}
+\begin{description}
+\item[Reg] (From Gary Lewandowski {\tt gary@cs.wisc.edu} Problem based
+on register allocation for variables in real codes.  For more
+instances, see the programs and data in graph/contributed/lewandowski.
+
+\item[Lei] (From Craig Morgenstern {\tt
+morgenst@riogrande.cs.tcu.edu}) Leighton graphs with guaranteed
+coloring size.  A reference is F.T. Leighton, {\it Journal of Research
+of the National Bureau of Standards}, {\bf 84:} 489--505 (1979).  For
+many more instances and programs, see the work in
+graph/contributed/morgenstern.  
+
+\item[Cul] (From Joe Culberson {\tt joe@cs.ualberta.ca}) Quasi-random
+  coloring problem.  For generator, and further information, see
+  program and README.gen in graph/contributed/culberson.
+
+\item[Sch] (From Gary Lewandowski {\tt lewandow@cs.wisc.edu}) Class
+  scheduling graphs, with and without study halls.
+
+\item[Lat] (From Gary Lewandowski {\tt lewandow@cs.wisc.edu}) Latin
+  square problem.
+
+\item[DSJ] (From David Johnson {\tt dsj@research.att.com}) Random
+graphs used in his paper with Aragon, McGeoch, and Schevon,
+``Optimization by Simulated Annelaing:  An Experimental Evaluation;
+Part II, Graph Coloring and Number Partitioning'', Operations
+Research, 31, 378--406 (1991).  DSJC are standard (n,p) random graphs.
+DSJR are geometric graphs, with DSJR..c being complements of geometric
+graphs.
+
+\end{description}
+
+\end{document}
