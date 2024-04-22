@@ -1,3 +1,4 @@
+mod compute_treewidth_upper_bound;
 mod construct_clique_graph;
 mod fill_bags_along_paths;
 mod find_connected_components;
@@ -7,6 +8,10 @@ mod find_width_of_tree_decomposition;
 mod generate_partial_k_tree;
 mod maximum_minimum_degree_heuristic;
 
+// Imports for using the library
+pub use compute_treewidth_upper_bound::{
+    compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
+};
 pub use construct_clique_graph::construct_clique_graph;
 pub use fill_bags_along_paths::fill_bags_along_paths;
 pub use find_connected_components::find_connected_components;
