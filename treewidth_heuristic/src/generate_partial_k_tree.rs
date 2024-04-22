@@ -1,3 +1,4 @@
+use log::info;
 use petgraph::{graph::NodeIndex, visit::IntoNodeIdentifiers, Graph, Undirected};
 use rand::{seq::IteratorRandom, Rng};
 
@@ -25,7 +26,7 @@ pub fn generate_partial_k_tree_with_guaranteed_treewidth(
             if maximum_minimum_degree(&graph) == k {
                 return Some(graph);
             } else {
-                println!("Graph was just discarded");
+                info!("Random partial-k-tree graph was just discarded");
             }
         } else {
             return None;

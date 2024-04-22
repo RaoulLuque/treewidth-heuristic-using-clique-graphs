@@ -1,3 +1,4 @@
+use log::warn;
 use petgraph::visit::IntoNeighborsDirected;
 use std::collections::{HashSet, VecDeque};
 use std::fmt::Debug;
@@ -34,6 +35,6 @@ where
             }
         }
     }
-    println!("Found no path");
+    warn!("Found no path in tree that should be connected");
     None
 }
