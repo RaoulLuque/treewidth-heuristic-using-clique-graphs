@@ -1,3 +1,4 @@
+mod clique_graph_edge_weight_heuristics;
 mod compute_treewidth_upper_bound;
 mod construct_clique_graph;
 mod fill_bags_along_paths;
@@ -9,6 +10,7 @@ mod generate_partial_k_tree;
 mod maximum_minimum_degree_heuristic;
 
 // Imports for using the library
+pub use clique_graph_edge_weight_heuristics::*;
 pub use compute_treewidth_upper_bound::{
     compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
 };
@@ -25,7 +27,6 @@ pub use maximum_minimum_degree_heuristic::maximum_minimum_degree;
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::*;
     use petgraph::{graph::NodeIndex, Graph};
 
     /// Struct for TestGraphs with necessary info for testing different functionalities

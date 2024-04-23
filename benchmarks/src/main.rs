@@ -28,7 +28,10 @@ fn main() {
                     println!("Starting calculation on graph: {:?}", graph_file_name);
                     // Time the calculation
                     let start = SystemTime::now();
-                    let computed_treewidth = compute_treewidth_upper_bound_not_connected(&graph);
+                    let computed_treewidth = compute_treewidth_upper_bound_not_connected(
+                        &graph,
+                        treewidth_heuristic::positive_intersection_heuristic,
+                    );
 
                     dimacs_log_file
                         .write_all(

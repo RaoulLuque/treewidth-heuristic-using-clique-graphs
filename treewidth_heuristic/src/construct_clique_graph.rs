@@ -9,6 +9,7 @@ use petgraph::Graph;
 /// and edges that connect two vertices if the intersection of the corresponding cliques is not empty.
 pub fn construct_clique_graph<InnerCollection, OuterIterator>(
     cliques: OuterIterator,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex>, &HashSet<NodeIndex>) -> i32,
 ) -> Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected>
 where
     OuterIterator: IntoIterator<Item = InnerCollection>,
@@ -35,7 +36,18 @@ where
             }
         }
         for other_vertex_index in edges_to_be_added.iter() {
-            result_graph.add_edge(vertex_index, *other_vertex_index, 0);
+            result_graph.add_edge(
+                vertex_index,
+                *other_vertex_index,
+                edge_weight_heuristic(
+                    result_graph
+                        .node_weight(vertex_index)
+                        .expect("Vertices in clique graph should have weights"),
+                    result_graph
+                        .node_weight(*other_vertex_index)
+                        .expect("Vertices in clique graph should have weights"),
+                ),
+            );
         }
     }
 
