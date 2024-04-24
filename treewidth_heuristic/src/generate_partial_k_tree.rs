@@ -1,5 +1,6 @@
 use log::info;
 use petgraph::{graph::NodeIndex, visit::IntoNodeIdentifiers, Graph, Undirected};
+use rand::prelude::SliceRandom;
 use rand::{seq::IteratorRandom, Rng};
 
 use crate::maximum_minimum_degree;
@@ -48,7 +49,7 @@ pub fn generate_partial_k_tree(
     if let Some(mut graph) = generate_k_tree(k, n) {
         // The number of edges in a k-tree
         let number_of_edges = k * (k - 1) / 2 + k * (n - k);
-
+        assert_eq!(number_of_edges, graph.edge_count());
         let number_of_edges_to_be_removed = ((number_of_edges * p) / 100).min(number_of_edges);
         // Remove p percent of nodes
         for edge_to_be_removed in graph
@@ -71,15 +72,21 @@ fn generate_k_tree(k: usize, n: usize) -> Option<Graph<i32, i32, Undirected>> {
         None
     } else {
         let mut graph = generate_complete_graph(k);
+        let mut potential_cliques: Vec<Vec<_>> = vec![graph.node_identifiers().collect()];
 
         // Add the missing n-k vertices
         for _ in k..n {
             let new_vertex = graph.add_node(0);
-            for old_vertex_index in graph
-                .node_identifiers()
-                .choose_multiple(&mut rand::thread_rng(), k)
-            {
+            let chosen_k_clique = potential_cliques
+                .choose(&mut rand::thread_rng())
+                .expect("There should be potential cliques")
+                .clone();
+            for old_vertex_index in chosen_k_clique.clone() {
                 graph.add_edge(new_vertex, old_vertex_index, 0);
+                let mut potential_new_clique = chosen_k_clique.clone();
+                potential_new_clique.retain(|v| v != &old_vertex_index);
+                potential_new_clique.push(new_vertex);
+                potential_cliques.push(potential_new_clique);
             }
         }
 
@@ -138,8 +145,9 @@ mod tests {
     #[test]
     fn test_generate_partial_k_tree_with_guarantee_with_maximum_minimum_degree() {
         let mut rng = rand::thread_rng();
-        let hundred_tree = generate_partial_k_tree_with_guaranteed_treewidth(10, 200, 10, &mut rng)
-            .expect("k is smaller than n");
+        let hundred_tree =
+            generate_partial_k_tree_with_guaranteed_treewidth(10, 1000, 40, &mut rng)
+                .expect("k is smaller than n");
         let twenty_five_tree =
             generate_partial_k_tree_with_guaranteed_treewidth(10, 500, 20, &mut rng)
                 .expect("k is smaller than n");
