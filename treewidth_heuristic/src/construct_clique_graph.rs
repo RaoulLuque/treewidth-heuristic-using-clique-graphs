@@ -57,7 +57,7 @@ where
 /// Constructs a clique graph given cliques of a graph.
 /// The clique graph consists of vertices which represent the cliques (bags)
 /// and edges that connect two vertices if the intersection of the corresponding cliques is not empty.
-/// 
+///
 /// Returns a tuple of the clique graph and a HashMap mapping the vertices in the original graph (the
 /// vertices from the bags) to HashSets containing the NodeIndices of all the Bags in the Clique Graph
 /// that contain the vertex from the original graph.
