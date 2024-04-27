@@ -1,11 +1,6 @@
 use itertools::Itertools;
 use log::{debug, info};
-use petgraph::{
-    algo::Measure,
-    graph::NodeIndex,
-    visit::{IntoNodeReferences, NodeRef},
-    Graph,
-};
+use petgraph::{algo::Measure, graph::NodeIndex, Graph};
 use std::{
     cmp::Ordering,
     collections::{BTreeSet, HashMap, HashSet},

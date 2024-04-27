@@ -150,53 +150,29 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_find_maximum_cliques_test_graph_one() {
-        let test_graph = crate::tests::setup_test_graph_one();
+    pub fn test_find_maximum_cliques() {
+        for i in 0..3 {
+            let test_graph = crate::tests::setup_test_graph(i);
 
-        let mut cliques: Vec<Vec<_>> =
-            find_maximum_cliques::<Vec<_>, _>(&test_graph.graph).collect();
+            let mut cliques: Vec<Vec<_>> =
+                find_maximum_cliques::<Vec<_>, _>(&test_graph.graph).collect();
 
-        for i in 0..cliques.len() {
-            cliques[i].sort();
+            for i in 0..cliques.len() {
+                cliques[i].sort();
+            }
+            cliques.sort();
+
+            assert_eq!(
+                cliques, test_graph.expected_max_cliques,
+                "Test graph: {}",
+                i
+            );
         }
-        cliques.sort();
-
-        assert_eq!(cliques, test_graph.expected_max_cliques);
-    }
-
-    #[test]
-    fn test_find_maximum_cliques_test_graph_two() {
-        let test_graph = crate::tests::setup_test_graph_two();
-
-        let mut cliques: Vec<Vec<_>> =
-            find_maximum_cliques::<Vec<_>, _>(&test_graph.graph).collect();
-
-        for i in 0..cliques.len() {
-            cliques[i].sort();
-        }
-        cliques.sort();
-
-        assert_eq!(cliques, test_graph.expected_max_cliques);
-    }
-
-    #[test]
-    fn test_find_maximum_cliques_test_graph_three() {
-        let test_graph = crate::tests::setup_test_graph_three();
-
-        let mut cliques: Vec<Vec<_>> =
-            find_maximum_cliques::<Vec<_>, _>(&test_graph.graph).collect();
-
-        for i in 0..cliques.len() {
-            cliques[i].sort();
-        }
-        cliques.sort();
-
-        assert_eq!(cliques, test_graph.expected_max_cliques);
     }
 
     #[test]
     pub fn test_find_maximum_cliques_bounded() {
-        let test_graph = crate::tests::setup_test_graph_one();
+        let test_graph = crate::tests::setup_test_graph(0);
 
         let mut cliques: Vec<Vec<_>> =
             find_maximum_cliques_bounded::<Vec<_>, _>(&test_graph.graph, 3).collect();
@@ -231,7 +207,7 @@ mod tests {
 
         assert_eq!(cliques, expected_bounded_max_cliques);
 
-        let test_graph = crate::tests::setup_test_graph_three();
+        let test_graph = crate::tests::setup_test_graph(2);
 
         let mut cliques: Vec<Vec<_>> =
             find_maximum_cliques_bounded::<Vec<_>, _>(&test_graph.graph, 3).collect();

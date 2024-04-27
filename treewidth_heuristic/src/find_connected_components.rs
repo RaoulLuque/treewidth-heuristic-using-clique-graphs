@@ -73,47 +73,23 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_find_maximum_cliques_test_graph_one() {
-        let test_graph = crate::tests::setup_test_graph_one();
+    pub fn test_find_connected_components() {
+        for i in 0..3 {
+            let test_graph = crate::tests::setup_test_graph(i);
 
-        let mut components: Vec<Vec<_>> =
-            find_connected_components::<Vec<_>, _, _>(&test_graph.graph).collect();
+            let mut components: Vec<Vec<_>> =
+                find_connected_components::<Vec<_>, _, _>(&test_graph.graph).collect();
 
-        for i in 0..components.len() {
-            components[i].sort();
+            for i in 0..components.len() {
+                components[i].sort();
+            }
+            components.sort();
+
+            assert_eq!(
+                components, test_graph.expected_connected_components,
+                "Test graph: {}",
+                i
+            );
         }
-        components.sort();
-
-        assert_eq!(components, test_graph.expected_connected_components);
-    }
-
-    #[test]
-    pub fn test_find_maximum_cliques_test_graph_two() {
-        let test_graph = crate::tests::setup_test_graph_two();
-
-        let mut components: Vec<Vec<_>> =
-            find_connected_components::<Vec<_>, _, _>(&test_graph.graph).collect();
-
-        for i in 0..components.len() {
-            components[i].sort();
-        }
-        components.sort();
-
-        assert_eq!(components, test_graph.expected_connected_components);
-    }
-
-    #[test]
-    pub fn test_find_maximum_cliques_test_graph_three() {
-        let test_graph = crate::tests::setup_test_graph_three();
-
-        let mut components: Vec<Vec<_>> =
-            find_connected_components::<Vec<_>, _, _>(&test_graph.graph).collect();
-
-        for i in 0..components.len() {
-            components[i].sort();
-        }
-        components.sort();
-
-        assert_eq!(components, test_graph.expected_connected_components);
     }
 }

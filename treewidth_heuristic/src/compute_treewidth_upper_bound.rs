@@ -107,60 +107,44 @@ mod tests {
     use crate::tests::*;
 
     #[test]
-    fn test_treewidth_heuristic_on_test_graph_two() {
-        let test_graph = setup_test_graph_two();
-        let _ = compute_treewidth_upper_bound_not_connected(
-            &test_graph.graph,
-            neutral_heuristic,
-            true,
-            true,
-        );
+    fn test_treewidth_heuristic_check_tree_decomposition() {
+        for i in 0..3 {
+            let test_graph = setup_test_graph(i);
+            let _ = compute_treewidth_upper_bound_not_connected(
+                &test_graph.graph,
+                neutral_heuristic,
+                true,
+                true,
+            );
 
-        let _ = compute_treewidth_upper_bound_not_connected(
-            &test_graph.graph,
-            neutral_heuristic,
-            false,
-            true,
-        );
+            let _ = compute_treewidth_upper_bound_not_connected(
+                &test_graph.graph,
+                neutral_heuristic,
+                false,
+                true,
+            );
+        }
     }
 
     #[test]
-    fn test_treewidth_heuristic_on_test_graph_three() {
-        let test_graph = setup_test_graph_three();
-        let computed_treewidth = compute_treewidth_upper_bound_not_connected(
-            &test_graph.graph,
-            neutral_heuristic,
-            true,
-            true,
-        );
-        assert_eq!(computed_treewidth, test_graph.treewidth);
+    fn test_treewidth_heuristic_and_check_result_neutral_weight_heuristic() {
+        for i in vec![0, 2] {
+            let test_graph = setup_test_graph(i);
+            let computed_treewidth = compute_treewidth_upper_bound_not_connected(
+                &test_graph.graph,
+                neutral_heuristic,
+                true,
+                false,
+            );
+            assert_eq!(computed_treewidth, test_graph.treewidth);
 
-        let computed_treewidth = compute_treewidth_upper_bound_not_connected(
-            &test_graph.graph,
-            neutral_heuristic,
-            false,
-            true,
-        );
-        assert_eq!(computed_treewidth, test_graph.treewidth);
-    }
-
-    #[test]
-    fn test_treewidth_heuristic_on_test_graph_one() {
-        let test_graph = setup_test_graph_one();
-        let computed_treewidth = compute_treewidth_upper_bound_not_connected(
-            &test_graph.graph,
-            neutral_heuristic,
-            true,
-            true,
-        );
-        assert_eq!(computed_treewidth, test_graph.treewidth);
-
-        let computed_treewidth = compute_treewidth_upper_bound_not_connected(
-            &test_graph.graph,
-            neutral_heuristic,
-            false,
-            true,
-        );
-        assert_eq!(computed_treewidth, test_graph.treewidth);
+            let computed_treewidth = compute_treewidth_upper_bound_not_connected(
+                &test_graph.graph,
+                neutral_heuristic,
+                false,
+                false,
+            );
+            assert_eq!(computed_treewidth, test_graph.treewidth);
+        }
     }
 }
