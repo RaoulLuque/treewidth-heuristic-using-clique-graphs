@@ -1,6 +1,5 @@
 use std::collections::{HashMap, HashSet};
 
-use log::info;
 use petgraph::graph::NodeIndex;
 use petgraph::visit::IntoNodeReferences;
 use petgraph::Graph;

@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use log::{debug, error, info};
+use log::{debug, info};
 use petgraph::{
     algo::Measure,
     graph::NodeIndex,
