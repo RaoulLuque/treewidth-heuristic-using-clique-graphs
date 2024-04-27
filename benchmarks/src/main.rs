@@ -32,7 +32,7 @@ fn main() {
                     let start = SystemTime::now();
                     let computed_treewidth = compute_treewidth_upper_bound_not_connected(
                         &graph,
-                        treewidth_heuristic::neutral_heuristic,
+                        treewidth_heuristic::negative_intersection_heuristic,
                     );
 
                     dimacs_log_file
@@ -53,27 +53,4 @@ fn main() {
             }
         }
     }
-
-    // let cliques: Vec<Vec<_>> = find_maximum_cliques::<Vec<_>, _>(&graph).collect();
-    // let mut clique_graph = construct_clique_graph(cliques);
-    // fill_bags_along_paths(&mut clique_graph);
-    // let computed_treewidth = find_width_of_tree_decomposition(&clique_graph);
-
-    // debug!("The computed treewidth is: {}", computed_treewidth);
-
-    // let start_graph_dot_file = Dot::with_config(&graph, &[Config::EdgeNoLabel]);
-    // let result_graph_dot_file = Dot::with_config(&clique_graph, &[Config::EdgeNoLabel]);
-
-    // fs::create_dir_all("target/visualizations")
-    //     .expect("Could not create directory for visualizations");
-    // fs::write(
-    //     "target/visualizations/starting_graph.dot",
-    //     start_graph_dot_file.to_string(),
-    // )
-    // .expect("Unable to write dotfile for first graph to files");
-
-    // let mut w = fs::File::create("target/visualizations/result_graph.dot")
-    //     .expect("Result graph file could not be created");
-    // write!(&mut w, "{:?}", result_graph_dot_file)
-    //     .expect("Unable to write dotfile for result graph to files");
 }

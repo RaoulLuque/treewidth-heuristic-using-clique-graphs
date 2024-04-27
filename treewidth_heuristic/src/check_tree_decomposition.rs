@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
-use log::info;
+use log::error;
 use petgraph::{
     prelude::*,
     visit::{IntoNodeReferences, NodeRef},
@@ -62,22 +62,25 @@ pub fn check_tree_decomposition(
                     .expect("Bag for the vertex should exist")
                     .is_superset(&intersection_set)
                 {
+                    let vertices_missing_along_path: HashSet<_> = intersection_set
+                        .difference(tree_decomposition_graph.node_weight(node_index).unwrap())
+                        .collect();
+
                     // DEBUG
-                    info!("Between the vertex: {:?} \n 
+                    error!("Between the vertex: {:?} \n 
                     and vertex: {:?} \n 
                     the bags intersect with: {:?} \n 
-                    however vertex {:?} along their path only contains the following vertices: {:?} \n \n
+                    however vertex {:?} along their path doesn't contain the following vertices: {:?} \n \n
 
-                    The full path is:",
-                    first_tuple, second_tuple, intersection_set, node_index, tree_decomposition_graph
-                    .node_weight(node_index).unwrap());
+                    The full path is: {:?}",
+                    first_tuple, second_tuple, intersection_set, node_index, vertices_missing_along_path, path);
 
-                    for node_index in intersection_set {
-                        info!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
+                    for node_index in vertices_missing_along_path {
+                        error!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
                     }
 
                     for node_index in path {
-                        info!(
+                        error!(
                             "{:?} with level: {} and predecessor {:?} 
                             and bag {:?}",
                             node_index,

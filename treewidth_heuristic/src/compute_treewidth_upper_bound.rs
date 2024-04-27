@@ -12,7 +12,8 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone>(
     info!("Finding maximum cliques");
     let cliques: Vec<Vec<_>> = find_maximum_cliques::<Vec<_>, _>(graph).collect();
     info!("Computing clique graph");
-    let (clique_graph, clique_graph_map) = construct_clique_graph_with_bags(cliques);
+    let (clique_graph, clique_graph_map) =
+        construct_clique_graph_with_bags(cliques, edge_weight_heuristic);
     // let clique_graph: Graph<_, _, _> = construct_clique_graph(cliques, edge_weight_heuristic);
     info!("Computing min spanning tree");
     let mut clique_graph_tree: Graph<
@@ -23,7 +24,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone>(
         &clique_graph,
     ));
     info!("Filling bags to get tree decomposition");
-    
+
     let predecessor_map =
         fill_bags_along_paths_abusing_structure(&mut clique_graph_tree, &clique_graph_map);
     // fill_bags_along_paths(&mut clique_graph_tree);

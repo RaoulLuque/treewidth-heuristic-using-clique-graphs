@@ -121,6 +121,7 @@ pub fn fill_bags_along_paths_abusing_structure<E: Copy + Default + Debug>(
         .expect("Graph shouldn't be empty");
     setup_predecessors(&graph, &mut tree_predecessor_map, root);
 
+    // DEBUG
     debug!(
         "Clique Tree Graph currently looks like this: {:?} \n",
         graph
@@ -141,6 +142,7 @@ pub fn fill_bags_along_paths_abusing_structure<E: Copy + Default + Debug>(
         )
     }
 
+    // DEBUG
     debug!(
         "Clique Tree Graph looks like this after filling up: {:?} \n",
         graph
@@ -192,28 +194,29 @@ fn fill_bags_until_common_predecessor<E>(
     if vertices_in_clique_graph.len() > 1 {
         for vertex_in_clique_graph in vertices_in_clique_graph {
             if let Some((predecessor, index)) = predecessors_map.get(vertex_in_clique_graph) {
+                // Skip the vertex in clique graph since it already contains the vertex in initial graph
                 predecessors.insert(Predecessor {
                     node_index: *predecessor,
                     level_index: *index,
+                });
+            } else {
+                // If there is no predecessor, vertex_in_clique_graph is the root node and as such
+                // is the common predecessors and path's need to be filled up until there
+                predecessors.insert(Predecessor {
+                    node_index: *vertex_in_clique_graph,
+                    level_index: 0,
                 });
             }
         }
     }
 
     // DEBUG
-    if *vertex_in_initial_graph == NodeIndex::new(26) {
-        debug!(
-            "Vertices in clique graph that contain vertex with index 26 from initial graph: {:?} \n",
-            vertices_in_clique_graph
-        );
-        debug!("Meanwhile vertex with index 0 contains the following vertices from the initial graph: {:?} \n", 
-        clique_graph.node_weight(NodeIndex::new(0)).unwrap());
-    }
     debug!("Currently filling in {:?}", vertex_in_initial_graph);
 
     // Loop that looks at ancestor of vertex with highest level index in tree. Inserts the ancestors
     // in the predecessors, not inserting duplicates. If only one ancestor is left, the common ancestor is found.
     while predecessors.len() > 1 {
+        // DEBUG
         debug!("Predecessors: {:?}", predecessors);
         // Current vertex should be the one with the highest level index in the tree
         let current_vertex_in_clique_graph = predecessors
@@ -234,13 +237,6 @@ fn fill_bags_until_common_predecessor<E>(
             .expect("Bag for the vertex should exist")
             .insert(*vertex_in_initial_graph);
 
-        //DEBUG
-        if *vertex_in_initial_graph == NodeIndex::new(26) {
-            if current_vertex_in_clique_graph.node_index == NodeIndex::new(0) {
-                debug!("Currently looking at Node in clique graph with index 0 \n \n");
-            }
-        }
-
         if let Some((predecessor_clique_graph_vertex, index)) =
             predecessors_map.get(&current_vertex_in_clique_graph.node_index)
         {
@@ -258,15 +254,11 @@ fn fill_bags_until_common_predecessor<E>(
                 "After inserting predecessor the predecessors look like this: {:?} \n \n",
                 predecessors
             );
-        } else {
-            error!(
-                "No predecessor found for {:?}",
-                current_vertex_in_clique_graph
-            );
         }
     }
     // This is reached once the common ancestor is found and the only element left in the collection
     if let Some(common_predecessor) = predecessors.first() {
+        // DEBUG
         debug!(
             "Filling in vertex from initial graph: {:?} into common ancestor: {:?}",
             vertex_in_initial_graph, common_predecessor
@@ -281,7 +273,6 @@ fn fill_bags_until_common_predecessor<E>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::*;
 
     #[test]
     fn test_predecessor_eq() {

@@ -64,6 +64,7 @@ where
 /// that contain the vertex from the original graph.
 pub fn construct_clique_graph_with_bags<InnerCollection, OuterIterator>(
     cliques: OuterIterator,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex>, &HashSet<NodeIndex>) -> i32,
 ) -> (
     Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected>,
     HashMap<NodeIndex, HashSet<NodeIndex>>,
@@ -83,14 +84,6 @@ where
             add_node_index_to_bag_in_hashmap(&mut result_map, vertex_in_clique, vertex_index);
         }
 
-        // DEBUG
-        if vertex_index == NodeIndex::new(0) {
-            info!(
-                "The vertex with index 0 in Clique graph starts off with the bag: {:?}",
-                result_graph.node_weight(NodeIndex::new(0)).unwrap()
-            );
-        }
-
         let mut edges_to_be_added = Vec::new();
         for (other_vertex_index, other_vertex_weight) in result_graph.node_references() {
             if other_vertex_index == vertex_index {
@@ -108,7 +101,18 @@ where
             }
         }
         for other_vertex_index in edges_to_be_added.iter() {
-            result_graph.add_edge(vertex_index, *other_vertex_index, 0);
+            result_graph.add_edge(
+                vertex_index,
+                *other_vertex_index,
+                edge_weight_heuristic(
+                    result_graph
+                        .node_weight(vertex_index)
+                        .expect("Vertices in clique graph should have weights"),
+                    result_graph
+                        .node_weight(*other_vertex_index)
+                        .expect("Vertices in clique graph should have weights"),
+                ),
+            );
         }
     }
 
