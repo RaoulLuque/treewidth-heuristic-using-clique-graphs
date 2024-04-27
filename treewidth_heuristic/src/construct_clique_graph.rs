@@ -1,7 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
 use petgraph::graph::NodeIndex;
-use petgraph::visit::IntoNodeReferences;
 use petgraph::Graph;
 
 /// Constructs a clique graph given cliques of a graph.
@@ -19,35 +18,26 @@ where
         Graph::new_undirected();
     for clique in cliques {
         let vertex_index = result_graph.add_node(HashSet::from_iter(clique.into_iter()));
-        let mut edges_to_be_added = Vec::new();
-        for (other_vertex_index, other_vertex_weight) in result_graph.node_references() {
+        for other_vertex_index in result_graph.node_indices() {
             if other_vertex_index == vertex_index {
                 continue;
             } else {
-                if let Some(_) = result_graph
+                let other_vertex_weight = result_graph
+                    .node_weight(other_vertex_index)
+                    .expect("Node weight should exist");
+                let this_vertex_weight = result_graph
                     .node_weight(vertex_index)
-                    .expect("Node weight - in this case the nodes in the clique - should exist")
-                    .intersection(other_vertex_weight)
-                    .next()
-                {
+                    .expect("Node weight should exist");
+
+                if let Some(_) = this_vertex_weight.intersection(other_vertex_weight).next() {
                     // Add edge, if cliques (that are the nodes of result graph) have nodes in common
-                    edges_to_be_added.push(other_vertex_index);
+                    result_graph.add_edge(
+                        vertex_index,
+                        other_vertex_index,
+                        edge_weight_heuristic(this_vertex_weight, other_vertex_weight),
+                    );
                 }
             }
-        }
-        for other_vertex_index in edges_to_be_added.iter() {
-            result_graph.add_edge(
-                vertex_index,
-                *other_vertex_index,
-                edge_weight_heuristic(
-                    result_graph
-                        .node_weight(vertex_index)
-                        .expect("Vertices in clique graph should have weights"),
-                    result_graph
-                        .node_weight(*other_vertex_index)
-                        .expect("Vertices in clique graph should have weights"),
-                ),
-            );
         }
     }
 
@@ -82,36 +72,29 @@ where
         for vertex_in_clique in clique {
             add_node_index_to_bag_in_hashmap(&mut result_map, vertex_in_clique, vertex_index);
         }
-
-        let mut edges_to_be_added = Vec::new();
-        for (other_vertex_index, other_vertex_weight) in result_graph.node_references() {
+        for other_vertex_index in result_graph.node_indices() {
             if other_vertex_index == vertex_index {
                 continue;
             } else {
-                if let Some(_) = result_graph
+                let other_vertex_weight = result_graph
+                    .node_weight(other_vertex_index)
+                    .expect("Node weight should exist");
+                let vertex_weight = result_graph
                     .node_weight(vertex_index)
-                    .expect("Node weight - in this case the nodes in the clique - should exist")
-                    .intersection(other_vertex_weight)
-                    .next()
-                {
+                    .expect("Node weight - in this case the nodes in the clique - should exist");
+
+                if let Some(_) = vertex_weight.intersection(other_vertex_weight).next() {
                     // Add edge, if cliques (that are the nodes of result graph) have nodes in common
-                    edges_to_be_added.push(other_vertex_index);
+                    result_graph.add_edge(
+                        vertex_index,
+                        other_vertex_index,
+                        edge_weight_heuristic(
+                            vertex_weight,
+                            other_vertex_weight,
+                        ),
+                    );
                 }
             }
-        }
-        for other_vertex_index in edges_to_be_added.iter() {
-            result_graph.add_edge(
-                vertex_index,
-                *other_vertex_index,
-                edge_weight_heuristic(
-                    result_graph
-                        .node_weight(vertex_index)
-                        .expect("Vertices in clique graph should have weights"),
-                    result_graph
-                        .node_weight(*other_vertex_index)
-                        .expect("Vertices in clique graph should have weights"),
-                ),
-            );
         }
     }
 

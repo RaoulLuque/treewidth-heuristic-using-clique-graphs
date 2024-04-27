@@ -56,20 +56,20 @@ pub fn check_tree_decomposition(
         )
         .next()
         .expect("There should be a path in the tree");
+        if !intersection_set.is_empty() {
+            for node_index in path.clone() {
+                if node_index != first_id {
+                    if !tree_decomposition_graph
+                        .node_weight(node_index)
+                        .expect("Bag for the vertex should exist")
+                        .is_superset(&intersection_set)
+                    {
+                        let vertices_missing_along_path: HashSet<_> = intersection_set
+                            .difference(tree_decomposition_graph.node_weight(node_index).unwrap())
+                            .collect();
 
-        for node_index in path.clone() {
-            if node_index != first_id {
-                if !tree_decomposition_graph
-                    .node_weight(node_index)
-                    .expect("Bag for the vertex should exist")
-                    .is_superset(&intersection_set)
-                {
-                    let vertices_missing_along_path: HashSet<_> = intersection_set
-                        .difference(tree_decomposition_graph.node_weight(node_index).unwrap())
-                        .collect();
-
-                    // DEBUG
-                    error!("Between the vertex: {:?} \n 
+                        // DEBUG
+                        error!("Between the vertex: {:?} \n 
                     and vertex: {:?} \n 
                     the bags intersect with: {:?} \n 
                     however vertex {:?} along their path doesn't contain the following vertices: {:?} \n \n
@@ -77,33 +77,34 @@ pub fn check_tree_decomposition(
                     The full path is: {:?}",
                     first_tuple, second_tuple, intersection_set, node_index, vertices_missing_along_path, path);
 
-                    if let (Some(predecessor_map), Some(clique_graph_map)) =
-                        (predecessor_map, clique_graph_map)
-                    {
-                        // DEBUG
-                        for node_index in vertices_missing_along_path {
-                            error!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
-                        }
+                        if let (Some(predecessor_map), Some(clique_graph_map)) =
+                            (predecessor_map, clique_graph_map)
+                        {
+                            // DEBUG
+                            for node_index in vertices_missing_along_path {
+                                error!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
+                            }
 
-                        // DEBUG
-                        for node_index in path {
-                            error!(
-                                "{:?} with level: {} and predecessor {:?} 
+                            // DEBUG
+                            for node_index in path {
+                                error!(
+                                    "{:?} with level: {} and predecessor {:?} 
                             and bag {:?}",
-                                node_index,
-                                match predecessor_map.get(&node_index) {
-                                    Some(predecessor) => predecessor.1 + 1,
-                                    None => 0,
-                                },
-                                match predecessor_map.get(&node_index) {
-                                    Some(predecessor) => Some(predecessor.0),
-                                    None => None,
-                                },
-                                tree_decomposition_graph.node_weight(node_index).unwrap()
-                            );
+                                    node_index,
+                                    match predecessor_map.get(&node_index) {
+                                        Some(predecessor) => predecessor.1 + 1,
+                                        None => 0,
+                                    },
+                                    match predecessor_map.get(&node_index) {
+                                        Some(predecessor) => Some(predecessor.0),
+                                        None => None,
+                                    },
+                                    tree_decomposition_graph.node_weight(node_index).unwrap()
+                                );
+                            }
                         }
+                        return false;
                     }
-                    return false;
                 }
             }
         }
