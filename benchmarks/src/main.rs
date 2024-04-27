@@ -33,6 +33,8 @@ fn main() {
                     let computed_treewidth = compute_treewidth_upper_bound_not_connected(
                         &graph,
                         treewidth_heuristic::negative_intersection_heuristic,
+                        false,
+                        false,
                     );
 
                     dimacs_log_file

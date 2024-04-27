@@ -9,14 +9,16 @@ use petgraph::{
 
 /// Given a tree decomposition checks if it is a valid tree decomposition. Returns true if the decomposition
 /// is valid, returns false otherwise.
+///
+/// If predecessor map and clique graph map are passed, gives additional in the case that it is a faulty tree decomposition.
 pub fn check_tree_decomposition(
     tree_decomposition_graph: &Graph<
         std::collections::HashSet<petgraph::prelude::NodeIndex>,
         i32,
         petgraph::prelude::Undirected,
     >,
-    predecessor_map: &HashMap<NodeIndex, (NodeIndex, usize)>,
-    clique_graph_map: &HashMap<NodeIndex, HashSet<NodeIndex>>,
+    predecessor_map: Option<HashMap<NodeIndex, (NodeIndex, usize)>>,
+    clique_graph_map: Option<HashMap<NodeIndex, HashSet<NodeIndex>>>,
 ) -> bool {
     for mut vec in tree_decomposition_graph.node_references().combinations(2) {
         let first_tuple = vec.pop().expect("Vec should contain two items");
@@ -75,25 +77,31 @@ pub fn check_tree_decomposition(
                     The full path is: {:?}",
                     first_tuple, second_tuple, intersection_set, node_index, vertices_missing_along_path, path);
 
-                    for node_index in vertices_missing_along_path {
-                        error!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
-                    }
+                    if let (Some(predecessor_map), Some(clique_graph_map)) =
+                        (predecessor_map, clique_graph_map)
+                    {
+                        // DEBUG
+                        for node_index in vertices_missing_along_path {
+                            error!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
+                        }
 
-                    for node_index in path {
-                        error!(
-                            "{:?} with level: {} and predecessor {:?} 
+                        // DEBUG
+                        for node_index in path {
+                            error!(
+                                "{:?} with level: {} and predecessor {:?} 
                             and bag {:?}",
-                            node_index,
-                            match predecessor_map.get(&node_index) {
-                                Some(predecessor) => predecessor.1 + 1,
-                                None => 0,
-                            },
-                            match predecessor_map.get(&node_index) {
-                                Some(predecessor) => Some(predecessor.0),
-                                None => None,
-                            },
-                            tree_decomposition_graph.node_weight(node_index).unwrap()
-                        );
+                                node_index,
+                                match predecessor_map.get(&node_index) {
+                                    Some(predecessor) => predecessor.1 + 1,
+                                    None => 0,
+                                },
+                                match predecessor_map.get(&node_index) {
+                                    Some(predecessor) => Some(predecessor.0),
+                                    None => None,
+                                },
+                                tree_decomposition_graph.node_weight(node_index).unwrap()
+                            );
+                        }
                     }
                     return false;
                 }
