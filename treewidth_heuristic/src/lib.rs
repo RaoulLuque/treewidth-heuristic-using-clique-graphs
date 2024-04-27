@@ -1,3 +1,4 @@
+mod check_tree_decomposition;
 mod clique_graph_edge_weight_heuristics;
 mod compute_treewidth_upper_bound;
 mod construct_clique_graph;
@@ -10,12 +11,13 @@ mod generate_partial_k_tree;
 mod maximum_minimum_degree_heuristic;
 
 // Imports for using the library
+pub use check_tree_decomposition::check_tree_decomposition;
 pub use clique_graph_edge_weight_heuristics::*;
 pub use compute_treewidth_upper_bound::{
     compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
 };
-pub use construct_clique_graph::construct_clique_graph;
-pub use fill_bags_along_paths::fill_bags_along_paths;
+pub use construct_clique_graph::{construct_clique_graph, construct_clique_graph_with_bags};
+pub use fill_bags_along_paths::{fill_bags_along_paths, fill_bags_along_paths_abusing_structure};
 pub use find_connected_components::find_connected_components;
 pub use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
 pub use find_path_in_tree::find_path_in_tree;

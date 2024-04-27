@@ -7,6 +7,8 @@ use std::time::SystemTime;
 use treewidth_heuristic::compute_treewidth_upper_bound_not_connected;
 
 fn main() {
+    env_logger::init();
+
     // Opening and writing to log file
     let mut dimacs_log_file = File::create("benchmarks/benchmark_results/dimacs_results.txt")
         .expect("Dimacs log file should be creatable");
@@ -30,7 +32,7 @@ fn main() {
                     let start = SystemTime::now();
                     let computed_treewidth = compute_treewidth_upper_bound_not_connected(
                         &graph,
-                        treewidth_heuristic::positive_intersection_heuristic,
+                        treewidth_heuristic::neutral_heuristic,
                     );
 
                     dimacs_log_file
@@ -57,7 +59,7 @@ fn main() {
     // fill_bags_along_paths(&mut clique_graph);
     // let computed_treewidth = find_width_of_tree_decomposition(&clique_graph);
 
-    // println!("The computed treewidth is: {}", computed_treewidth);
+    // debug!("The computed treewidth is: {}", computed_treewidth);
 
     // let start_graph_dot_file = Dot::with_config(&graph, &[Config::EdgeNoLabel]);
     // let result_graph_dot_file = Dot::with_config(&clique_graph, &[Config::EdgeNoLabel]);

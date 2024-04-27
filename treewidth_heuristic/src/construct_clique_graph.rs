@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
+use log::info;
 use petgraph::graph::NodeIndex;
 use petgraph::visit::IntoNodeReferences;
 use petgraph::Graph;
@@ -80,6 +81,14 @@ where
         let vertex_index = result_graph.add_node(HashSet::from_iter(clique.clone().into_iter()));
         for vertex_in_clique in clique {
             add_node_index_to_bag_in_hashmap(&mut result_map, vertex_in_clique, vertex_index);
+        }
+
+        // DEBUG
+        if vertex_index == NodeIndex::new(0) {
+            info!(
+                "The vertex with index 0 in Clique graph starts off with the bag: {:?}",
+                result_graph.node_weight(NodeIndex::new(0)).unwrap()
+            );
         }
 
         let mut edges_to_be_added = Vec::new();
