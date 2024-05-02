@@ -10,8 +10,9 @@ fn main() {
     env_logger::init();
 
     // Opening and writing to log file
-    let mut dimacs_log_file = File::create("benchmarks/benchmark_results/dimacs_results.txt")
-        .expect("Dimacs log file should be creatable");
+    let mut benchmark_log_file =
+        File::create("dimacs_benchmarks/benchmark_results/dimacs_results.txt")
+            .expect("Dimacs log file should be creatable");
 
     // Testing dimacs_graph
     let dimacs_graphs_paths = fs::read_dir("dimacs_graphs/color/").unwrap();
@@ -37,7 +38,7 @@ fn main() {
                         false,
                     );
 
-                    dimacs_log_file
+                    benchmark_log_file
                         .write_all(
                             format!(
                                 "{:?}: {} took {:.3} milliseconds\n",

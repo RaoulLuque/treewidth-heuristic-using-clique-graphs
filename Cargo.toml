@@ -2,7 +2,8 @@
 
 members = [
     "treewidth_heuristic",
-    "benchmarks"
+    "dimacs_benchmarks",
+    "k_tree_benchmarks"
 ]
 resolver = "2"
 

@@ -1,0 +1,4 @@
+"mulsol.i.1.col": 135 took 109 milliseconds
+"zeroin.i.1.col": 124 took 84 milliseconds
+"inithx.i.2.col": 545 took 3223 milliseconds
+"mulsol.i.5.col": 156 took 111 milliseconds

@@ -1,0 +1,15 @@
+Graph 0: 20 took 709 milliseconds
+Graph 1: 20 took 732 milliseconds
+Graph 2: 20 took 730 milliseconds
+Graph 3: 20 took 837 milliseconds
+Graph 4: 20 took 809 milliseconds
+Graph 5: 20 took 724 milliseconds
+Graph 6: 20 took 749 milliseconds
+Graph 7: 20 took 713 milliseconds
+Graph 8: 20 took 714 milliseconds
+Graph 9: 20 took 701 milliseconds
+Graph 10: 20 took 714 milliseconds
+Graph 11: 20 took 689 milliseconds
+Graph 12: 20 took 722 milliseconds
+Graph 13: 20 took 759 milliseconds
+Graph 14: 20 took 706 milliseconds
