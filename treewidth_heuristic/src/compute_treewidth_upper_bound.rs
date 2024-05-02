@@ -26,7 +26,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone>(
         let (clique_graph, clique_graph_map) =
             construct_clique_graph_with_bags(cliques, edge_weight_heuristic);
         // DEBUG
-        println!("Initial clique graph: {:?}", clique_graph);
+        // println!("Initial clique graph: {:?}", clique_graph);
 
         let mut clique_graph_tree: Graph<
             std::collections::HashSet<petgraph::prelude::NodeIndex>,
@@ -39,10 +39,10 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone>(
         let predecessor_map =
             fill_bags_along_paths_abusing_structure(&mut clique_graph_tree, &clique_graph_map);
         // DEBUG
-        println!(
-            "Clique graph tree after filling up: {:?} \n \n",
-            clique_graph_tree
-        );
+        // println!(
+        //     "Clique graph tree after filling up: {:?} \n \n",
+        //     clique_graph_tree
+        // );
 
         (
             clique_graph_tree,
