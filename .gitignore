@@ -1,3 +1,4 @@
 /target
 /test_results
-/benchmarks/benchmark_results
+/dimacs_benchmarks/benchmark_results
+/k_tree_benchmarks/benchmark_results
