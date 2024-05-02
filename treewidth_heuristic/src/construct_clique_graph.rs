@@ -88,10 +88,7 @@ where
                     result_graph.add_edge(
                         vertex_index,
                         other_vertex_index,
-                        edge_weight_heuristic(
-                            vertex_weight,
-                            other_vertex_weight,
-                        ),
+                        edge_weight_heuristic(vertex_weight, other_vertex_weight),
                     );
                 }
             }
