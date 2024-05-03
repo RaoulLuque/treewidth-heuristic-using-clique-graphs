@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use crate::*;
 use petgraph::{graph::NodeIndex, Graph, Undirected};
@@ -17,62 +17,84 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone>(
     edge_weight_heuristic: fn(&HashSet<NodeIndex>, &HashSet<NodeIndex>) -> i32,
     use_predecessor_map_to_fill_bags: bool,
     check_tree_decomposition_bool: bool,
-) -> usize {
+) -> (
+    Graph<HashSet<NodeIndex>, i32, Undirected>,
+    Graph<HashSet<NodeIndex>, i32, Undirected>,
+    Option<HashMap<NodeIndex, (NodeIndex, usize)>>,
+    Option<HashMap<NodeIndex, HashSet<NodeIndex>>>,
+    usize,
+) {
     // Find cliques in initial graph
     let cliques: Vec<Vec<_>> = find_maximum_cliques::<Vec<_>, _>(graph).collect();
 
-    let (clique_graph_tree, clique_graph_map, predecessor_map) = if use_predecessor_map_to_fill_bags
-    {
-        let (clique_graph, clique_graph_map) =
-            construct_clique_graph_with_bags(cliques, edge_weight_heuristic);
-        // DEBUG
-        // println!("Initial clique graph: {:?}", clique_graph);
+    let (clique_graph_tree, clique_graph_map, predecessor_map, clique_graph_tree_before_filling) =
+        if use_predecessor_map_to_fill_bags {
+            let (clique_graph, clique_graph_map) =
+                construct_clique_graph_with_bags(cliques, edge_weight_heuristic);
+            // DEBUG
+            // println!("Initial clique graph: {:?}", clique_graph);
 
-        let mut clique_graph_tree: Graph<
-            std::collections::HashSet<petgraph::prelude::NodeIndex>,
-            i32,
-            petgraph::prelude::Undirected,
-        > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
-            &clique_graph,
-        ));
+            let mut clique_graph_tree: Graph<
+                std::collections::HashSet<petgraph::prelude::NodeIndex>,
+                i32,
+                petgraph::prelude::Undirected,
+            > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
+                &clique_graph,
+            ));
+            let clique_graph_tree_before_filling = clique_graph_tree.clone();
 
-        let predecessor_map =
-            fill_bags_along_paths_abusing_structure(&mut clique_graph_tree, &clique_graph_map);
-        // DEBUG
-        // println!(
-        //     "Clique graph tree after filling up: {:?} \n \n",
-        //     clique_graph_tree
-        // );
+            let predecessor_map =
+                fill_bags_along_paths_abusing_structure(&mut clique_graph_tree, &clique_graph_map);
+            // DEBUG
+            // println!(
+            //     "Clique graph tree after filling up: {:?} \n \n",
+            //     clique_graph_tree
+            // );
 
-        (
-            clique_graph_tree,
-            Some(clique_graph_map),
-            Some(predecessor_map),
-        )
-    } else {
-        let clique_graph: Graph<_, _, _> = construct_clique_graph(cliques, edge_weight_heuristic);
+            (
+                clique_graph_tree,
+                Some(clique_graph_map),
+                Some(predecessor_map),
+                clique_graph_tree_before_filling,
+            )
+        } else {
+            let clique_graph: Graph<_, _, _> =
+                construct_clique_graph(cliques, edge_weight_heuristic);
 
-        let mut clique_graph_tree: Graph<
-            std::collections::HashSet<petgraph::prelude::NodeIndex>,
-            i32,
-            petgraph::prelude::Undirected,
-        > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
-            &clique_graph,
-        ));
+            let mut clique_graph_tree: Graph<
+                std::collections::HashSet<petgraph::prelude::NodeIndex>,
+                i32,
+                petgraph::prelude::Undirected,
+            > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
+                &clique_graph,
+            ));
+            let clique_graph_tree_before_filling = clique_graph_tree.clone();
 
-        fill_bags_along_paths(&mut clique_graph_tree);
+            fill_bags_along_paths(&mut clique_graph_tree);
 
-        (clique_graph_tree, None, None)
-    };
+            (
+                clique_graph_tree,
+                None,
+                None,
+                clique_graph_tree_before_filling,
+            )
+        };
     if check_tree_decomposition_bool {
         assert!(check_tree_decomposition(
             &clique_graph_tree,
-            predecessor_map,
-            clique_graph_map
+            &predecessor_map,
+            &clique_graph_map
         ));
     }
+    let treewidth = find_width_of_tree_decomposition(&clique_graph_tree);
 
-    find_width_of_tree_decomposition(&clique_graph_tree)
+    (
+        clique_graph_tree,
+        clique_graph_tree_before_filling,
+        predecessor_map,
+        clique_graph_map,
+        treewidth,
+    )
 }
 
 /// Computes an upper bound for the treewidth returning the maximum [compute_treewidth_upper_bound] on the
@@ -90,12 +112,15 @@ pub fn compute_treewidth_upper_bound_not_connected<N: Clone, E: Clone>(
         let mut subgraph = graph.clone();
         subgraph.retain_nodes(|_, v| component.contains(&v));
 
-        computed_treewidth = computed_treewidth.max(compute_treewidth_upper_bound(
-            &subgraph,
-            edge_weight_heuristic,
-            use_predecessor_map_to_fill_bags,
-            check_tree_decomposition_bool,
-        ));
+        computed_treewidth = computed_treewidth.max(
+            compute_treewidth_upper_bound(
+                &subgraph,
+                edge_weight_heuristic,
+                use_predecessor_map_to_fill_bags,
+                check_tree_decomposition_bool,
+            )
+            .4,
+        );
     }
 
     computed_treewidth

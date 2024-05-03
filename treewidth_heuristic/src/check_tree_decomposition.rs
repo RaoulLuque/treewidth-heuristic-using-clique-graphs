@@ -17,8 +17,8 @@ pub fn check_tree_decomposition(
         i32,
         petgraph::prelude::Undirected,
     >,
-    predecessor_map: Option<HashMap<NodeIndex, (NodeIndex, usize)>>,
-    clique_graph_map: Option<HashMap<NodeIndex, HashSet<NodeIndex>>>,
+    predecessor_map: &Option<HashMap<NodeIndex, (NodeIndex, usize)>>,
+    clique_graph_map: &Option<HashMap<NodeIndex, HashSet<NodeIndex>>>,
 ) -> bool {
     for mut vec in tree_decomposition_graph.node_references().combinations(2) {
         let first_tuple = vec.pop().expect("Vec should contain two items");

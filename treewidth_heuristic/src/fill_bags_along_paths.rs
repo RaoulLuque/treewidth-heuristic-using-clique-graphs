@@ -85,7 +85,7 @@ pub fn fill_bags_along_paths<E: Copy + Measure + Default>(
 /// and inserts the intersecting nodes in all bags that are along the (unique) path of the two bags in the tree.
 pub fn fill_bags_along_paths_abusing_structure<E: Copy + Default + Debug>(
     graph: &mut Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
-    map: &HashMap<NodeIndex, HashSet<NodeIndex>>,
+    clique_graph_map: &HashMap<NodeIndex, HashSet<NodeIndex>>,
 ) -> HashMap<NodeIndex, (NodeIndex, usize)> {
     info!("Building tree structure");
 
@@ -106,13 +106,14 @@ pub fn fill_bags_along_paths_abusing_structure<E: Copy + Default + Debug>(
         tree_predecessor_map
     );
 
-    for vertex_in_initial_graph in map.keys() {
+    for vertex_in_initial_graph in clique_graph_map.keys() {
         info!("Filling up bags");
         fill_bags_until_common_predecessor(
             graph,
             &tree_predecessor_map,
             &vertex_in_initial_graph,
-            &map.get(vertex_in_initial_graph)
+            &clique_graph_map
+                .get(vertex_in_initial_graph)
                 .expect("key should exist by loop invariant"),
         )
     }
@@ -165,14 +166,18 @@ fn fill_bags_until_common_predecessor<E>(
     vertex_in_initial_graph: &NodeIndex,
     vertices_in_clique_graph: &HashSet<NodeIndex>,
 ) {
+    // TO DO ?
+    // Maybe optimize by not filling up vertices_in_clique_graph, but inserting their predecessors already
+    // NOTE: Keep in mind, that one of the vertices_in_clique_graph might be the greatest common ancestor,
+    // so this can be done for all vertices_in_clique_graph that don't have the minimizing level (possible implementation)
     let mut predecessors: BTreeSet<Predecessor> = BTreeSet::new();
     if vertices_in_clique_graph.len() > 1 {
         for vertex_in_clique_graph in vertices_in_clique_graph {
-            if let Some((predecessor, index)) = predecessors_map.get(vertex_in_clique_graph) {
+            if let Some((_, index)) = predecessors_map.get(vertex_in_clique_graph) {
                 // Skip the vertex in clique graph since it already contains the vertex in initial graph
                 predecessors.insert(Predecessor {
-                    node_index: *predecessor,
-                    level_index: *index,
+                    node_index: *vertex_in_clique_graph,
+                    level_index: *index + 1,
                 });
             } else {
                 // If there is no predecessor, vertex_in_clique_graph is the root node and as such

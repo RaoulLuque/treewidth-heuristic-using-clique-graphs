@@ -75,8 +75,8 @@ fn generate_k_tree(k: usize, n: usize) -> Option<Graph<i32, i32, Undirected>> {
         let mut potential_cliques: Vec<Vec<_>> = vec![graph.node_identifiers().collect()];
 
         // Add the missing n-k vertices
-        for _ in k..n {
-            let new_vertex = graph.add_node(0);
+        for i in k..n {
+            let new_vertex = graph.add_node(i.try_into().unwrap());
             let chosen_k_clique = potential_cliques
                 .choose(&mut rand::thread_rng())
                 .expect("There should be potential cliques")
@@ -101,7 +101,9 @@ fn generate_complete_graph(k: usize) -> Graph<i32, i32, Undirected> {
         petgraph::Graph::new_undirected();
 
     // Add k nodes to the graph
-    let nodes: Vec<NodeIndex> = (0..k).map(|_| graph.add_node(0)).collect();
+    let nodes: Vec<NodeIndex> = (0..k)
+        .map(|i| graph.add_node(i.try_into().unwrap()))
+        .collect();
 
     // Connect each node to every other node
     for i in 0..k {
