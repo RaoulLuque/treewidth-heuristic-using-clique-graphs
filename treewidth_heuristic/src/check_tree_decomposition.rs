@@ -11,7 +11,8 @@ use petgraph::{
 /// is valid, returns false otherwise.
 ///
 /// If predecessor map and clique graph map are passed, gives additional in the case that it is a faulty tree decomposition.
-pub fn check_tree_decomposition(
+pub fn check_tree_decomposition<N, E>(
+    starting_graph: &Graph<N, E, Undirected>,
     tree_decomposition_graph: &Graph<
         std::collections::HashSet<petgraph::prelude::NodeIndex>,
         i32,
@@ -20,6 +21,41 @@ pub fn check_tree_decomposition(
     predecessor_map: &Option<HashMap<NodeIndex, (NodeIndex, usize)>>,
     clique_graph_map: &Option<HashMap<NodeIndex, HashSet<NodeIndex>>>,
 ) -> bool {
+    // Check if (1) from tree decomposition is satisfied (all vertices from starting graph appear in a bag in
+    // tree decomposition graph)
+    for vertex in starting_graph.node_indices() {
+        if let None = tree_decomposition_graph
+            .node_weights()
+            .find(|s| s.contains(&vertex))
+        {
+            error!("Tree decomposition doesn't contain vertex: {:?}", vertex);
+            return false;
+        }
+    }
+
+    // Check if (2) from tree decomposition is satisfied (for all edges in starting graph there is bag containing
+    // both its vertices)
+    for edge_reference in starting_graph.edge_references() {
+        let (vertex_one, vertex_two) = (edge_reference.source(), edge_reference.target());
+        let mut edge_as_set: HashSet<NodeIndex> = HashSet::new();
+        edge_as_set.insert(vertex_one);
+        edge_as_set.insert(vertex_two);
+        let mut edge_is_contained = false;
+
+        for vertex_weight in tree_decomposition_graph.node_weights() {
+            if vertex_weight.is_superset(&edge_as_set) {
+                edge_is_contained = true;
+            }
+        }
+
+        if !edge_is_contained {
+            error!("Tree decomposition doesn't contain edge: {:?}", edge_as_set);
+            return false;
+        }
+    }
+
+    // check if (3) from tree decomposition definition is satisfied (for one vertex in starting graph, all bags
+    // contain this vertex induce a subtree)
     for mut vec in tree_decomposition_graph.node_references().combinations(2) {
         let first_tuple = vec.pop().expect("Vec should contain two items");
         let second_tuple = vec.pop().expect("Vec should contain two items");
