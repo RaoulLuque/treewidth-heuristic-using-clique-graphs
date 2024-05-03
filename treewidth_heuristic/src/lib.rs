@@ -17,7 +17,7 @@ pub use compute_treewidth_upper_bound::{
     compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
 };
 pub use construct_clique_graph::{construct_clique_graph, construct_clique_graph_with_bags};
-pub use fill_bags_along_paths::{fill_bags_along_paths, fill_bags_along_paths_abusing_structure};
+pub use fill_bags_along_paths::{fill_bags_along_paths, fill_bags_along_paths_using_structure};
 pub use find_connected_components::find_connected_components;
 pub use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
 pub use find_path_in_tree::find_path_in_tree;
