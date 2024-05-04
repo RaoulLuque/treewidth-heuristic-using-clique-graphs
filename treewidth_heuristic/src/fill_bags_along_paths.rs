@@ -81,6 +81,14 @@ pub fn fill_bags_along_paths<E: Copy + Measure + Default>(
     }
 }
 
+pub fn fill_bags_specific_vertices<E>(
+    start_index: NodeIndex,
+    end_index: NodeIndex,
+    graph: &Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>
+) {
+
+}
+
 /// Given a tree graph with bags (HashSets) as Vertices, checks all 2-combinations of bags for non-empty-intersection
 /// and inserts the intersecting nodes in all bags that are along the (unique) path of the two bags in the tree.
 pub fn fill_bags_along_paths_using_structure<E: Copy + Default + Debug>(

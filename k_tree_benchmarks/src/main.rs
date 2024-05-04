@@ -9,8 +9,8 @@ use std::time::SystemTime;
 use treewidth_heuristic::compute_treewidth_upper_bound;
 
 fn main() {
-    let k = 5;
-    let n = 8;
+    let k = 3;
+    let n = 10;
     let p = 5;
     let edge_heuristic = treewidth_heuristic::least_difference_heuristic;
     let number_of_trees = 100;

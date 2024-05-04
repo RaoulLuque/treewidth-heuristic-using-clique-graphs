@@ -3,6 +3,7 @@ mod clique_graph_edge_weight_heuristics;
 mod compute_treewidth_upper_bound;
 mod construct_clique_graph;
 mod fill_bags_along_paths;
+mod fill_bags_while_generating_mst;
 mod find_connected_components;
 mod find_maximum_cliques;
 mod find_path_in_tree;
@@ -18,6 +19,7 @@ pub use compute_treewidth_upper_bound::{
 };
 pub use construct_clique_graph::{construct_clique_graph, construct_clique_graph_with_bags};
 pub use fill_bags_along_paths::{fill_bags_along_paths, fill_bags_along_paths_using_structure};
+pub use fill_bags_while_generating_mst::fill_bags_while_generating_mst;
 pub use find_connected_components::find_connected_components;
 pub use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
 pub use find_path_in_tree::find_path_in_tree;
