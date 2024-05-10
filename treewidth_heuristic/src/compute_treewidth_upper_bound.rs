@@ -23,7 +23,7 @@ pub enum TreewidthComputationMethod {
 pub fn compute_treewidth_upper_bound<N: Clone, E: Clone>(
     graph: &Graph<N, E, Undirected>,
     edge_weight_heuristic: fn(&HashSet<NodeIndex>, &HashSet<NodeIndex>) -> i32,
-    use_predecessor_map_to_fill_bags: TreewidthComputationMethod,
+    treewidth_computation_method: TreewidthComputationMethod,
     check_tree_decomposition_bool: bool,
 ) -> (
     Graph<HashSet<NodeIndex>, i32, Undirected>,
@@ -42,7 +42,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone>(
         predecessor_map,
         clique_graph_tree_before_filling,
         clique_graph,
-    ) = match use_predecessor_map_to_fill_bags {
+    ) = match treewidth_computation_method {
         TreewidthComputationMethod::MSTAndUseTreeStructure => {
             let (clique_graph, clique_graph_map) =
                 construct_clique_graph_with_bags(cliques, edge_weight_heuristic);
