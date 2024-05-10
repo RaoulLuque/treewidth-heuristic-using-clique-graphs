@@ -16,6 +16,7 @@ pub use check_tree_decomposition::check_tree_decomposition;
 pub use clique_graph_edge_weight_heuristics::*;
 pub use compute_treewidth_upper_bound::{
     compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
+    TreewidthComputationMethod,
 };
 pub use construct_clique_graph::{construct_clique_graph, construct_clique_graph_with_bags};
 pub use fill_bags_along_paths::{fill_bags_along_paths, fill_bags_along_paths_using_structure};

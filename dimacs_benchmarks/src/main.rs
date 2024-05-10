@@ -4,10 +4,15 @@ use std::io::Write;
 
 use petgraph::Graph;
 use std::time::SystemTime;
-use treewidth_heuristic::compute_treewidth_upper_bound_not_connected;
+use treewidth_heuristic::{
+    compute_treewidth_upper_bound_not_connected, TreewidthComputationMethod,
+};
 
 fn main() {
     env_logger::init();
+
+    let computation_type: TreewidthComputationMethod = TreewidthComputationMethod::FillWhilstMST;
+    let heuristic = treewidth_heuristic::least_difference_heuristic;
 
     // Opening and writing to log file
     let mut benchmark_log_file =
@@ -33,8 +38,8 @@ fn main() {
                     let start = SystemTime::now();
                     let computed_treewidth = compute_treewidth_upper_bound_not_connected(
                         &graph,
-                        treewidth_heuristic::negative_intersection_heuristic,
-                        false,
+                        heuristic,
+                        computation_type,
                         false,
                     );
 
