@@ -1,6 +1,6 @@
 use std::{
     collections::{HashMap, HashSet},
-    hash::{BuildHasher, RandomState},
+    hash::BuildHasher,
 };
 
 use crate::*;
@@ -64,7 +64,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
             let clique_graph_tree_before_filling = clique_graph_tree.clone();
 
             // DEBUG
-            let mut clique_graph_tree_copy: Graph<
+            let clique_graph_tree_copy: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
                 i32,
                 petgraph::prelude::Undirected,
@@ -190,6 +190,8 @@ pub fn compute_treewidth_upper_bound_not_connected<
 
 #[cfg(test)]
 mod tests {
+    use std::hash::RandomState;
+
     use super::*;
     use crate::tests::*;
 

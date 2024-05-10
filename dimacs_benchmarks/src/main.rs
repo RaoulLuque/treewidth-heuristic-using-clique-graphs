@@ -38,8 +38,12 @@ fn main() {
                     let graph_file = File::open(graph_path.path())
                         .expect("Graph file should exist and be readable");
 
-                    let graph: Graph<i32, i32, petgraph::prelude::Undirected> =
-                        read_graph(graph_file).expect("Graph should be in correct format");
+                    let (graph, _, _, _): (
+                        Graph<i32, i32, petgraph::prelude::Undirected>,
+                        _,
+                        _,
+                        _,
+                    ) = read_graph(graph_file).expect("Graph should be in correct format");
 
                     // DEBUG
                     // {

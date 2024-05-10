@@ -3,3 +3,4 @@
 /dimacs_benchmarks/benchmark_results
 /k_tree_benchmarks/benchmark_results
 k_tree_benchmarks/benchmark_results/k_tree_results.txt
+/.vscode

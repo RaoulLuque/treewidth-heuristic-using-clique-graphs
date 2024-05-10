@@ -31,6 +31,7 @@ c edge density        : 0.097035
 c max degree          : 66
 c avg degree          : 43.57
 c min degree          : 27
+u 315
 p edge 450 9803
 e 1 440
 e 1 164

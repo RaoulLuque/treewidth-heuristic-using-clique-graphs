@@ -6,6 +6,7 @@ c DESCRIPTION: Coloring problem generated from a register allocation
 c              problem based on real code.
 c
 c graph #2 from register allocation file inithx.i
+u 31
 p edge 645 13979
 e 1 2
 e 1 3
