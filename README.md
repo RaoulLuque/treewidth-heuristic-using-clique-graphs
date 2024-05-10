@@ -19,8 +19,9 @@ let graph = UnGraph::<i32, ()>::from_edges(&[
     (1, 2), (2, 3), (3, 4),
     (1, 4)]);
 
-// Compute treewidth using the negative intersection heuristic, the FillWhilstMST computation method
-// and not checking the tree decomposition for correctness after the computation.
+// Compute treewidth using the negative intersection heuristic, 
+// the FillWhilstMST computation method and not checking the 
+// tree decomposition for correctness after the computation.
 let treewidth_upper_bound = compute_treewidth_upper_bound(
     &graph,
     negative_intersection_heuristic,
