@@ -1,27 +1,30 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    hash::BuildHasher,
+};
 
 use petgraph::{graph::NodeIndex, Graph, Undirected};
 
-pub fn fill_bags_while_generating_mst<N, E>(
-    clique_graph: &Graph<HashSet<NodeIndex>, i32, Undirected>,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex>, &HashSet<NodeIndex>) -> i32,
-    clique_graph_map: HashMap<NodeIndex, HashSet<NodeIndex>>,
-) -> Graph<HashSet<NodeIndex>, i32, Undirected> {
-    let mut result_graph: Graph<HashSet<NodeIndex>, i32, Undirected> = Graph::new_undirected();
+pub fn fill_bags_while_generating_mst<N, E, S: Default + BuildHasher + Clone>(
+    clique_graph: &Graph<HashSet<NodeIndex, S>, i32, Undirected>,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
+    clique_graph_map: HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
+) -> Graph<HashSet<NodeIndex, S>, i32, Undirected> {
+    let mut result_graph: Graph<HashSet<NodeIndex, S>, i32, Undirected> = Graph::new_undirected();
     // Maps the vertex indices from the clique graph to the corresponding vertex indices in the result graph
-    let mut node_index_map: HashMap<NodeIndex, NodeIndex> = HashMap::new();
+    let mut node_index_map: HashMap<NodeIndex, NodeIndex, S> = Default::default();
     let mut vertex_iter = clique_graph.node_indices();
 
     let first_vertex_clique = vertex_iter.next().expect("Graph shouldn't be empty");
 
     // Keeps track of the remaining vertices from the clique graph that still need to be added to
     // the result_graph
-    let mut clique_graph_remaining_vertices: HashSet<NodeIndex> = vertex_iter.collect();
+    let mut clique_graph_remaining_vertices: HashSet<NodeIndex, S> = vertex_iter.collect();
 
     // Keeps track of the vertices that could be added to the current sub-tree-graph
     // First Tuple entry is node_index from the result graph that has an outgoing edge
     // Second tuple entry is node_index from the clique graph that is the interesting vertex
-    let mut currently_interesting_vertices: HashSet<(NodeIndex, NodeIndex)> = HashSet::new();
+    let mut currently_interesting_vertices: HashSet<(NodeIndex, NodeIndex), S> = Default::default();
 
     let first_vertex_res = result_graph.add_node(
         clique_graph
@@ -109,10 +112,10 @@ pub fn fill_bags_while_generating_mst<N, E>(
 ///
 /// Panics: Panics if there is no path between start and end_vertex, especially in the case that
 /// one of the vertices is not contained in the graph
-fn fill_bags(
+fn fill_bags<S: BuildHasher>(
     start_vertex: NodeIndex,
     end_vertex: NodeIndex,
-    graph: &mut Graph<HashSet<NodeIndex>, i32, Undirected>,
+    graph: &mut Graph<HashSet<NodeIndex, S>, i32, Undirected>,
     vertex_to_be_insert_from_starting_graph: NodeIndex,
 ) {
     let mut path: Vec<_> = petgraph::algo::simple_paths::all_simple_paths::<Vec<NodeIndex>, _>(
@@ -142,11 +145,11 @@ fn fill_bags(
 ///
 /// Returns a tuple with a node index from the result graph in the first and node index from the clique graph
 /// in the second entry
-fn find_cheapest_vertex(
-    clique_graph: &Graph<HashSet<NodeIndex>, i32, Undirected>,
-    result_graph: &Graph<HashSet<NodeIndex>, i32, Undirected>,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex>, &HashSet<NodeIndex>) -> i32,
-    currently_interesting_vertices: &HashSet<(NodeIndex, NodeIndex)>,
+fn find_cheapest_vertex<S>(
+    clique_graph: &Graph<HashSet<NodeIndex, S>, i32, Undirected>,
+    result_graph: &Graph<HashSet<NodeIndex, S>, i32, Undirected>,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
+    currently_interesting_vertices: &HashSet<(NodeIndex, NodeIndex), S>,
 ) -> (NodeIndex, NodeIndex) {
     *currently_interesting_vertices
         .iter()

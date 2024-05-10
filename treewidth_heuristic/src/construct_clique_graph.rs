@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use std::hash::BuildHasher;
 
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
@@ -6,15 +7,15 @@ use petgraph::Graph;
 /// Constructs a clique graph given cliques of a graph.
 /// The clique graph consists of vertices which represent the cliques (bags)
 /// and edges that connect two vertices if the intersection of the corresponding cliques is not empty.
-pub fn construct_clique_graph<InnerCollection, OuterIterator>(
+pub fn construct_clique_graph<InnerCollection, OuterIterator, S: Default + BuildHasher>(
     cliques: OuterIterator,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex>, &HashSet<NodeIndex>) -> i32,
-) -> Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected>
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
+) -> Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected>
 where
     OuterIterator: IntoIterator<Item = InnerCollection>,
     InnerCollection: IntoIterator<Item = NodeIndex>,
 {
-    let mut result_graph: Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected> =
+    let mut result_graph: Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected> =
         Graph::new_undirected();
     for clique in cliques {
         let vertex_index = result_graph.add_node(HashSet::from_iter(clique.into_iter()));
@@ -51,21 +52,21 @@ where
 /// Returns a tuple of the clique graph and a HashMap mapping the vertices in the original graph (the
 /// vertices from the bags) to HashSets containing the NodeIndices of all the Bags in the Clique Graph
 /// that contain the vertex from the original graph.
-pub fn construct_clique_graph_with_bags<InnerCollection, OuterIterator>(
+pub fn construct_clique_graph_with_bags<InnerCollection, OuterIterator, S: Default + BuildHasher>(
     cliques: OuterIterator,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex>, &HashSet<NodeIndex>) -> i32,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
 ) -> (
-    Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected>,
-    HashMap<NodeIndex, HashSet<NodeIndex>>,
+    Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected>,
+    HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
 )
 where
     OuterIterator: IntoIterator<Item = InnerCollection>,
     InnerCollection: IntoIterator<Item = NodeIndex>,
     InnerCollection: Clone,
 {
-    let mut result_graph: Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected> =
+    let mut result_graph: Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected> =
         Graph::new_undirected();
-    let mut result_map: HashMap<NodeIndex, HashSet<NodeIndex>> = HashMap::new();
+    let mut result_map: HashMap<NodeIndex, HashSet<NodeIndex, S>, S> = Default::default();
 
     for clique in cliques {
         let vertex_index = result_graph.add_node(HashSet::from_iter(clique.clone().into_iter()));
@@ -98,15 +99,15 @@ where
     (result_graph, result_map)
 }
 
-fn add_node_index_to_bag_in_hashmap(
-    map: &mut HashMap<NodeIndex, HashSet<NodeIndex>>,
+fn add_node_index_to_bag_in_hashmap<S: Default + std::hash::BuildHasher>(
+    map: &mut HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
     vertex_in_graph: NodeIndex,
     vertex_in_clique_graph: NodeIndex,
 ) {
     if let Some(set) = map.get_mut(&vertex_in_graph) {
         set.insert(vertex_in_clique_graph);
     } else {
-        let mut set = HashSet::new();
+        let mut set: HashSet<NodeIndex, S> = Default::default();
         set.insert(vertex_in_clique_graph);
         map.insert(vertex_in_graph, set);
     }

@@ -1,4 +1,7 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    hash::BuildHasher,
+};
 
 use itertools::Itertools;
 use log::error;
@@ -11,15 +14,15 @@ use petgraph::{
 /// is valid, returns false otherwise.
 ///
 /// If predecessor map and clique graph map are passed, gives additional in the case that it is a faulty tree decomposition.
-pub fn check_tree_decomposition<N, E>(
+pub fn check_tree_decomposition<N, E, S: BuildHasher + Default>(
     starting_graph: &Graph<N, E, Undirected>,
     tree_decomposition_graph: &Graph<
-        std::collections::HashSet<petgraph::prelude::NodeIndex>,
+        std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
         i32,
         petgraph::prelude::Undirected,
     >,
-    predecessor_map: &Option<HashMap<NodeIndex, (NodeIndex, usize)>>,
-    clique_graph_map: &Option<HashMap<NodeIndex, HashSet<NodeIndex>>>,
+    predecessor_map: &Option<HashMap<NodeIndex, (NodeIndex, usize), S>>,
+    clique_graph_map: &Option<HashMap<NodeIndex, HashSet<NodeIndex, S>, S>>,
 ) -> bool {
     // Check if (1) from tree decomposition is satisfied (all vertices from starting graph appear in a bag in
     // tree decomposition graph)
@@ -37,7 +40,7 @@ pub fn check_tree_decomposition<N, E>(
     // both its vertices)
     for edge_reference in starting_graph.edge_references() {
         let (vertex_one, vertex_two) = (edge_reference.source(), edge_reference.target());
-        let mut edge_as_set: HashSet<NodeIndex> = HashSet::new();
+        let mut edge_as_set: HashSet<_, S> = Default::default();
         edge_as_set.insert(vertex_one);
         edge_as_set.insert(vertex_two);
         let mut edge_is_contained = false;
@@ -66,7 +69,7 @@ pub fn check_tree_decomposition<N, E>(
             second_tuple.weight(),
         );
 
-        let intersection_set: HashSet<_> =
+        let intersection_set: HashSet<_, S> =
             first_weight.intersection(second_weight).cloned().collect();
 
         assert_eq!(
@@ -100,7 +103,7 @@ pub fn check_tree_decomposition<N, E>(
                         .expect("Bag for the vertex should exist")
                         .is_superset(&intersection_set)
                     {
-                        let vertices_missing_along_path: HashSet<_> = intersection_set
+                        let vertices_missing_along_path: HashSet<_, S> = intersection_set
                             .difference(tree_decomposition_graph.node_weight(node_index).unwrap())
                             .collect();
 

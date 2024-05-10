@@ -8,11 +8,19 @@ use petgraph::Graph;
 use std::time::SystemTime;
 use treewidth_heuristic::{compute_treewidth_upper_bound, TreewidthComputationMethod};
 
+// Debug version
+#[cfg(debug_assertions)]
+type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
+
+// Non-debug version
+#[cfg(not(debug_assertions))]
+type Hasher = std::hash::RandomState;
+
 fn main() {
     let k = 10;
     let n = 100;
     let p = 10;
-    let edge_heuristic = treewidth_heuristic::least_difference_heuristic;
+    let edge_heuristic = treewidth_heuristic::least_difference_heuristic::<Hasher>;
     let number_of_trees = 100;
     let computation_type = TreewidthComputationMethod::FillWhilstMST;
 
@@ -133,16 +141,16 @@ fn main() {
 
 // Converting dot files to pdf in bulk:
 // FullPath -type f -name "*.dot" | xargs dot -Tpdf -O
-fn create_dot_files(
+fn create_dot_files<S>(
     graph: &Graph<i32, i32, petgraph::prelude::Undirected>,
-    clique_graph: &Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected>,
+    clique_graph: &Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected>,
     clique_graph_tree_after_filling_up: &Graph<
-        HashSet<NodeIndex>,
+        HashSet<NodeIndex, S>,
         i32,
         petgraph::prelude::Undirected,
     >,
     clique_graph_tree_before_filling_up: &Option<
-        Graph<HashSet<NodeIndex>, i32, petgraph::prelude::Undirected>,
+        Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected>,
     >,
     i: usize,
     name: &str,

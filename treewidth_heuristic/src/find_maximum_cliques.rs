@@ -1,12 +1,15 @@
 use itertools::Itertools;
 use petgraph::visit::{GraphBase, IntoNeighborsDirected, IntoNodeIdentifiers, NodeCount};
+use std::hash::BuildHasher;
 use std::iter::from_fn;
 use std::{collections::HashSet, hash::Hash};
 
 /// Returns an iterator that produces all maximum cliques in the given graph in arbitrary order.
 ///
 /// This algorithm is adapted from <https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.clique.find_cliques.html>.
-pub fn find_maximum_cliques<TargetColl, G>(graph: G) -> impl Iterator<Item = TargetColl>
+pub fn find_maximum_cliques<TargetColl, G, S: Default + BuildHasher + Clone>(
+    graph: G,
+) -> impl Iterator<Item = TargetColl>
 where
     G: NodeCount,
     G: IntoNeighborsDirected,
@@ -21,7 +24,7 @@ where
     // last elem is list of children of last visited node
     let mut stack = vec![];
 
-    let mut atcc: HashSet<G::NodeId> = graph.node_identifiers().collect();
+    let mut atcc: HashSet<G::NodeId, S> = graph.node_identifiers().collect();
 
     let u = *atcc
         .iter()
@@ -33,10 +36,10 @@ where
         .expect("Graph shouldn't be empty");
 
     let mut promising_candidates: Vec<G::NodeId> = atcc.iter().cloned().collect();
-    let neighbors_u: HashSet<G::NodeId> = graph.neighbors(u).collect();
+    let neighbors_u: HashSet<G::NodeId, S> = graph.neighbors(u).collect();
     promising_candidates.retain(|v| !neighbors_u.contains(v));
 
-    let mut candidates: HashSet<G::NodeId> = graph.node_identifiers().collect();
+    let mut candidates: HashSet<G::NodeId, S> = graph.node_identifiers().collect();
 
     // current clique - Q                       : Clique that is currently being constructed
     // candidates - cand                        : Current candidates that could be added to Q (current Clique) - special for handling cliques with the given set of nodes
@@ -57,7 +60,7 @@ where
 
                     candidates.remove(&q);
 
-                    let adjacent_to_q: HashSet<G::NodeId> = graph.neighbors(q).collect();
+                    let adjacent_to_q: HashSet<G::NodeId, S> = graph.neighbors(q).collect();
                     let mut atcc_q = atcc.clone();
                     atcc_q.retain(|v| adjacent_to_q.contains(v));
 
@@ -90,7 +93,7 @@ where
                                 })
                                 .expect("Graph shouldn't be empty");
                             promising_candidates = candidates.iter().cloned().collect();
-                            let neighbors_u: HashSet<G::NodeId> = graph.neighbors(u).collect();
+                            let neighbors_u: HashSet<G::NodeId, S> = graph.neighbors(u).collect();
                             promising_candidates.retain(|v| !neighbors_u.contains(v));
                         }
                     }
@@ -111,7 +114,7 @@ where
 /// part of maximum cliques that are themselves bigger in size than k in arbitrary order.
 ///
 /// Uses the [find_maximum_cliques] method.
-pub fn find_maximum_cliques_bounded<TargetColl, G>(
+pub fn find_maximum_cliques_bounded<TargetColl, G, S: Default + Clone + BuildHasher>(
     graph: G,
     k: usize,
 ) -> impl Iterator<Item = TargetColl>
@@ -123,9 +126,9 @@ where
     TargetColl: FromIterator<G::NodeId>,
     <G as GraphBase>::NodeId: 'static,
 {
-    let mut maximum_cliques = find_maximum_cliques::<HashSet<_>, G>(graph);
-    let mut combinations = HashSet::new().into_iter().combinations(k);
-    let mut seen_combinations = HashSet::new();
+    let mut maximum_cliques = find_maximum_cliques::<HashSet<_>, G, S>(graph);
+    let mut combinations = crate::hashset![].into_iter().combinations(k);
+    let mut seen_combinations = crate::hashset![];
     from_fn(move || loop {
         if let Some(mut clique_combination) = combinations.next() {
             clique_combination.sort();
@@ -147,6 +150,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use std::hash::RandomState;
+
     use super::*;
 
     #[test]
@@ -155,7 +160,7 @@ mod tests {
             let test_graph = crate::tests::setup_test_graph(i);
 
             let mut cliques: Vec<Vec<_>> =
-                find_maximum_cliques::<Vec<_>, _>(&test_graph.graph).collect();
+                find_maximum_cliques::<Vec<_>, _, RandomState>(&test_graph.graph).collect();
 
             for i in 0..cliques.len() {
                 cliques[i].sort();
@@ -175,7 +180,7 @@ mod tests {
         let test_graph = crate::tests::setup_test_graph(0);
 
         let mut cliques: Vec<Vec<_>> =
-            find_maximum_cliques_bounded::<Vec<_>, _>(&test_graph.graph, 3).collect();
+            find_maximum_cliques_bounded::<Vec<_>, _, RandomState>(&test_graph.graph, 3).collect();
 
         for i in 0..cliques.len() {
             cliques[i].sort();
@@ -210,7 +215,7 @@ mod tests {
         let test_graph = crate::tests::setup_test_graph(2);
 
         let mut cliques: Vec<Vec<_>> =
-            find_maximum_cliques_bounded::<Vec<_>, _>(&test_graph.graph, 3).collect();
+            find_maximum_cliques_bounded::<Vec<_>, _, RandomState>(&test_graph.graph, 3).collect();
 
         for i in 0..cliques.len() {
             cliques[i].sort();

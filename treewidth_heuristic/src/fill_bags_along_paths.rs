@@ -5,6 +5,7 @@ use std::{
     cmp::Ordering,
     collections::{BTreeSet, HashMap, HashSet},
     fmt::Debug,
+    hash::BuildHasher,
 };
 
 #[derive(PartialEq, Eq, Debug)]
@@ -36,8 +37,8 @@ impl PartialOrd for Predecessor {
 
 /// Given a tree graph with bags (HashSets) as Vertices, checks all 2-combinations of bags for non-empty-intersection
 /// and inserts the intersecting nodes in all bags that are along the (unique) path of the two bags in the tree.
-pub fn fill_bags_along_paths<E: Copy + Measure + Default>(
-    graph: &mut Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
+pub fn fill_bags_along_paths<E: Copy + Measure + Default, S: BuildHasher>(
+    graph: &mut Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
 ) {
     // Finding out which paths between bags have to be checked
     for mut vec in graph.node_indices().combinations(2) {
@@ -83,13 +84,16 @@ pub fn fill_bags_along_paths<E: Copy + Measure + Default>(
 
 /// Given a tree graph with bags (HashSets) as Vertices, checks all 2-combinations of bags for non-empty-intersection
 /// and inserts the intersecting nodes in all bags that are along the (unique) path of the two bags in the tree.
-pub fn fill_bags_along_paths_using_structure<E: Copy + Default + Debug>(
-    graph: &mut Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
-    clique_graph_map: &HashMap<NodeIndex, HashSet<NodeIndex>>,
-) -> HashMap<NodeIndex, (NodeIndex, usize)> {
+pub fn fill_bags_along_paths_using_structure<
+    E: Copy + Default + Debug,
+    S: Default + BuildHasher,
+>(
+    graph: &mut Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
+    clique_graph_map: &HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
+) -> HashMap<NodeIndex, (NodeIndex, usize), S> {
     info!("Building tree structure");
 
-    let mut tree_predecessor_map: HashMap<NodeIndex, (NodeIndex, usize)> = HashMap::new();
+    let mut tree_predecessor_map: HashMap<NodeIndex, (NodeIndex, usize), S> = Default::default();
     let root = graph
         .node_indices()
         .max_by_key(|v| graph.neighbors(*v).collect::<Vec<_>>().len())
@@ -129,9 +133,9 @@ pub fn fill_bags_along_paths_using_structure<E: Copy + Default + Debug>(
 
 /// Sets up the predecessor map such that each node has a predecessor going back to the root node.
 /// Additionally there is an index, indicating the depth level at which the predecessor is (root is 0)
-fn setup_predecessors<E>(
-    graph: &Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
-    predecessors_map: &mut HashMap<NodeIndex, (NodeIndex, usize)>,
+fn setup_predecessors<E, S: BuildHasher>(
+    graph: &Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
+    predecessors_map: &mut HashMap<NodeIndex, (NodeIndex, usize), S>,
     root: NodeIndex,
 ) {
     let mut stack: Vec<(NodeIndex, usize)> = Vec::new();
@@ -160,11 +164,11 @@ fn setup_predecessors<E>(
     );
 }
 
-fn fill_bags_until_common_predecessor<E>(
-    clique_graph: &mut Graph<HashSet<NodeIndex>, E, petgraph::prelude::Undirected>,
-    predecessors_map: &HashMap<NodeIndex, (NodeIndex, usize)>,
+fn fill_bags_until_common_predecessor<E, S: BuildHasher>(
+    clique_graph: &mut Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
+    predecessors_map: &HashMap<NodeIndex, (NodeIndex, usize), S>,
     vertex_in_initial_graph: &NodeIndex,
-    vertices_in_clique_graph: &HashSet<NodeIndex>,
+    vertices_in_clique_graph: &HashSet<NodeIndex, S>,
 ) {
     // TO DO ?
     // Maybe optimize by not filling up vertices_in_clique_graph, but inserting their predecessors already

@@ -79,6 +79,7 @@ dependencies = [
  "dimacs_petgraph_parser",
  "env_logger",
  "petgraph",
+ "rustc-hash",
  "serde",
  "treewidth_heuristic",
 ]
@@ -187,6 +188,7 @@ version = "0.1.0"
 dependencies = [
  "petgraph",
  "rand",
+ "rustc-hash",
  "serde",
  "treewidth_heuristic",
 ]
@@ -303,6 +305,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "adad44e29e4c806119491a7f06f03de4d1af22c3a680dd47f1e6e179439d1f56"
 
 [[package]]
+name = "rustc-hash"
+version = "1.1.0"
+source = "git+https://github.com/rust-lang/rustc-hash#e155548d4bc95fb98e214506d79a87a7bacdb025"
+
+[[package]]
 name = "serde"
 version = "1.0.200"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -341,6 +348,7 @@ dependencies = [
  "log",
  "petgraph",
  "rand",
+ "rustc-hash",
 ]
 
 [[package]]

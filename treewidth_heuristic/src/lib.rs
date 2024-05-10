@@ -30,6 +30,25 @@ pub use generate_partial_k_tree::{
 };
 pub use maximum_minimum_degree_heuristic::maximum_minimum_degree;
 
+// Debug version
+#[cfg(debug_assertions)]
+macro_rules! hashset {
+    () => {{
+        let tmp: std::collections::HashSet<_, std::hash::BuildHasherDefault<rustc_hash::FxHasher>> =
+            Default::default();
+        tmp
+    }};
+}
+
+// Non-debug version
+#[cfg(not(debug_assertions))]
+macro_rules! hashset {
+    () => {
+        std::collections::HashSet::new()
+    };
+}
+pub(crate) use hashset;
+
 #[cfg(test)]
 pub(crate) mod tests {
     use petgraph::{graph::NodeIndex, Graph};
@@ -258,5 +277,27 @@ pub(crate) mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn hash_test() {
+        let mut test = true;
+        for _ in 0..100 {
+            let a = (0..100).zip(100..200);
+            let mut set_one = hashset![];
+
+            let mut set_two = hashset![];
+
+            for entry in a {
+                set_one.insert(entry);
+                set_two.insert(entry);
+            }
+
+            if !set_one.into_iter().eq(set_two) {
+                test = false;
+            }
+        }
+
+        debug_assert!(test);
     }
 }
