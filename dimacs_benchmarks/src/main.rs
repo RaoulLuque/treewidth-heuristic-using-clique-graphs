@@ -20,6 +20,7 @@ type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
 type Hasher = std::hash::RandomState;
 
 #[derive(Debug)]
+#[allow(dead_code)]
 enum HeuristicTypes {
     MstFillNi,
     MstTreeNi,
@@ -31,14 +32,7 @@ enum HeuristicTypes {
 
 use HeuristicTypes::*;
 
-const HEURISTICS_BEING_TEST: [HeuristicTypes; 6] = [
-    MstFillNi,
-    MstTreeNi,
-    FillWhileNi,
-    MstFillLd,
-    MstTreeLd,
-    FillWhileLd,
-];
+const HEURISTICS_BEING_TEST: [HeuristicTypes; 4] = [MstTreeNi, FillWhileNi, MstTreeLd, FillWhileLd];
 
 fn main() {
     env_logger::init();
@@ -66,15 +60,8 @@ fn main() {
     benchmark_log_file
         .write_all(
             format!(
-                "| {0: <20} | {1: <12} | {2: <12} | {3: <12} | {4: <12} | {5: <12} | {6: <12} | {7: <12} |\n",
-                "Graph name",
-                "Upper bound",
-                "MSTFillNI",
-                "MSTTreeNI",
-                "FillWhileNI",
-                "MSTFillLD",
-                "MSTTreeLD",
-                "FillWhileLD"
+                "| {0: <20} | {1: <12} | {2: <12} | {3: <12} | {4: <12} | {5: <12} | \n",
+                "Graph name", "Upper bound", "MSTTreeNI", "FillWhileNI", "MSTTreeLD", "FillWhileLD"
             )
             .as_bytes(),
         )
