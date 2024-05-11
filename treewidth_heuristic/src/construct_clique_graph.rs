@@ -9,13 +9,13 @@ use petgraph::Graph;
 /// and edges that connect two vertices if the intersection of the corresponding cliques is not empty.
 pub fn construct_clique_graph<InnerCollection, OuterIterator, S: Default + BuildHasher>(
     cliques: OuterIterator,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
-) -> Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected>
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> Vec<i32>,
+) -> Graph<HashSet<NodeIndex, S>, Vec<i32>, petgraph::prelude::Undirected>
 where
     OuterIterator: IntoIterator<Item = InnerCollection>,
     InnerCollection: IntoIterator<Item = NodeIndex>,
 {
-    let mut result_graph: Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected> =
+    let mut result_graph: Graph<HashSet<NodeIndex, S>, Vec<i32>, petgraph::prelude::Undirected> =
         Graph::new_undirected();
     for clique in cliques {
         let vertex_index = result_graph.add_node(HashSet::from_iter(clique.into_iter()));
@@ -54,9 +54,9 @@ where
 /// that contain the vertex from the original graph.
 pub fn construct_clique_graph_with_bags<InnerCollection, OuterIterator, S: Default + BuildHasher>(
     cliques: OuterIterator,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> Vec<i32>,
 ) -> (
-    Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected>,
+    Graph<HashSet<NodeIndex, S>, Vec<i32>, petgraph::prelude::Undirected>,
     HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
 )
 where
@@ -64,7 +64,7 @@ where
     InnerCollection: IntoIterator<Item = NodeIndex>,
     InnerCollection: Clone,
 {
-    let mut result_graph: Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected> =
+    let mut result_graph: Graph<HashSet<NodeIndex, S>, Vec<i32>, petgraph::prelude::Undirected> =
         Graph::new_undirected();
     let mut result_map: HashMap<NodeIndex, HashSet<NodeIndex, S>, S> = Default::default();
 

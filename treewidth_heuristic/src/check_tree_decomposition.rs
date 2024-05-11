@@ -18,7 +18,7 @@ pub fn check_tree_decomposition<N, E, S: BuildHasher + Default>(
     starting_graph: &Graph<N, E, Undirected>,
     tree_decomposition_graph: &Graph<
         std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-        i32,
+        Vec<i32>,
         petgraph::prelude::Undirected,
     >,
     predecessor_map: &Option<HashMap<NodeIndex, (NodeIndex, usize), S>>,

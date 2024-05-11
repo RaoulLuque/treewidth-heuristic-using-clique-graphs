@@ -143,14 +143,14 @@ fn main() {
 // FullPath -type f -name "*.dot" | xargs dot -Tpdf -O
 fn create_dot_files<S>(
     graph: &Graph<i32, i32, petgraph::prelude::Undirected>,
-    clique_graph: &Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected>,
+    clique_graph: &Graph<HashSet<NodeIndex, S>, Vec<i32>, petgraph::prelude::Undirected>,
     clique_graph_tree_after_filling_up: &Graph<
         HashSet<NodeIndex, S>,
-        i32,
+        Vec<i32>,
         petgraph::prelude::Undirected,
     >,
     clique_graph_tree_before_filling_up: &Option<
-        Graph<HashSet<NodeIndex, S>, i32, petgraph::prelude::Undirected>,
+        Graph<HashSet<NodeIndex, S>, Vec<i32>, petgraph::prelude::Undirected>,
     >,
     i: usize,
     name: &str,

@@ -25,13 +25,13 @@ pub enum TreewidthComputationMethod {
 /// and path that is faulty.
 pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHasher + Clone>(
     graph: &Graph<N, E, Undirected>,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> Vec<i32>,
     treewidth_computation_method: TreewidthComputationMethod,
     check_tree_decomposition_bool: bool,
 ) -> (
-    Graph<HashSet<NodeIndex, S>, i32, Undirected>,
-    Graph<HashSet<NodeIndex, S>, i32, Undirected>,
-    Option<Graph<HashSet<NodeIndex, S>, i32, Undirected>>,
+    Graph<HashSet<NodeIndex, S>, Vec<i32>, Undirected>,
+    Graph<HashSet<NodeIndex, S>, Vec<i32>, Undirected>,
+    Option<Graph<HashSet<NodeIndex, S>, Vec<i32>, Undirected>>,
     Option<HashMap<NodeIndex, (NodeIndex, usize), S>>,
     Option<HashMap<NodeIndex, HashSet<NodeIndex, S>, S>>,
     usize,
@@ -54,7 +54,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
 
             let mut clique_graph_tree: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                i32,
+                Vec<i32>,
                 petgraph::prelude::Undirected,
             > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
                 &clique_graph,
@@ -79,7 +79,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
 
             let mut clique_graph_tree: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                i32,
+                Vec<i32>,
                 petgraph::prelude::Undirected,
             > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
                 &clique_graph,
@@ -89,7 +89,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
             // DEBUG
             let clique_graph_tree_copy: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                i32,
+                Vec<i32>,
                 petgraph::prelude::Undirected,
             > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
                 &clique_graph,
@@ -123,7 +123,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
 
             let clique_graph_tree: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                i32,
+                Vec<i32>,
                 petgraph::prelude::Undirected,
             > = fill_bags_while_generating_mst::<N, E, S>(
                 &clique_graph,
@@ -163,7 +163,7 @@ pub fn compute_treewidth_upper_bound_not_connected<
     S: Default + BuildHasher + Clone,
 >(
     graph: &Graph<N, E, Undirected>,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> Vec<i32>,
     treewidth_computation_method: TreewidthComputationMethod,
     check_tree_decomposition_bool: bool,
 ) -> usize {
