@@ -21,25 +21,22 @@ type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
 type Hasher = std::hash::RandomState;
 
 /// First coordinate is the n, second k, third p
-pub const PARTIAL_K_TREE_CONFIGURATIONS: [(usize, usize, usize); 18] = [
-    (100, 10, 30),
-    (100, 20, 30),
-    (100, 10, 40),
-    (100, 20, 40),
-    (100, 10, 50),
-    (100, 20, 50),
-    (200, 10, 30),
-    (200, 20, 30),
-    (200, 10, 40),
-    (200, 20, 40),
-    (200, 10, 50),
-    (200, 20, 50),
-    (500, 10, 30),
-    (500, 20, 30),
-    (500, 10, 40),
-    (500, 20, 40),
-    (500, 10, 50),
-    (500, 20, 50),
+pub const PARTIAL_K_TREE_CONFIGURATIONS: [(usize, usize, usize); 15] = [
+    (100, 10, 10),
+    (100, 20, 10),
+    (100, 10, 15),
+    (100, 20, 15),
+    (100, 10, 20),
+    (200, 10, 10),
+    (200, 20, 10),
+    (200, 10, 15),
+    (200, 20, 15),
+    (200, 10, 20),
+    (500, 10, 10),
+    (500, 20, 10),
+    (500, 10, 15),
+    (500, 20, 15),
+    (500, 10, 20),
 ];
 
 fn main() {
@@ -48,10 +45,10 @@ fn main() {
         File::create("k_tree_benchmarks/benchmark_results/k_tree_results.txt")
             .expect("Dimacs log file should be creatable");
 
-    let number_of_repetitions_per_heuristic = 10;
+    let number_of_repetitions_per_heuristic = 5;
 
     for (n, k, p) in PARTIAL_K_TREE_CONFIGURATIONS {
-        let number_of_trees = 100;
+        let number_of_trees = 25;
 
         println!("Starting calculation on graph: {:?}", (n, k, p));
         let mut calculation_vec = Vec::new();
@@ -75,7 +72,12 @@ fn main() {
                 let edge_weight_heuristic = heuristic_to_edge_weight_heuristic(heuristic);
                 let computation_type = heuristic_to_computation_type(heuristic);
 
-                for _ in 0..number_of_repetitions_per_heuristic {
+                for j in 0..number_of_repetitions_per_heuristic {
+                    println!(
+                        "n: {} k: {} p: {} Tree: {} Iteration: {} for heuristic: {:?}",
+                        n, k, p, i, j, heuristic
+                    );
+
                     let computed_treewidth = match edge_weight_heuristic {
                         EdgeWeightTypes::ReturnI32(a) => {
                             compute_treewidth_upper_bound_not_connected::<_, _, Hasher, _>(

@@ -164,4 +164,20 @@ mod tests {
         assert_eq!(max_min_degree_hundred, 10);
         assert_eq!(max_min_degree_twenty_give, 10);
     }
+
+    #[test]
+    fn test_generate_partial_k_tree_with_guarantee_with_high_k() {
+        let mut rng = rand::thread_rng();
+        let hundred_tree = generate_partial_k_tree_with_guaranteed_treewidth(20, 100, 15, &mut rng)
+            .expect("k is smaller than n");
+        let twenty_five_tree =
+            generate_partial_k_tree_with_guaranteed_treewidth(30, 100, 10, &mut rng)
+                .expect("k is smaller than n");
+
+        let max_min_degree_hundred = crate::maximum_minimum_degree(&hundred_tree);
+        let max_min_degree_twenty_give = crate::maximum_minimum_degree(&twenty_five_tree);
+
+        assert_eq!(max_min_degree_hundred, 20);
+        assert_eq!(max_min_degree_twenty_give, 30);
+    }
 }
