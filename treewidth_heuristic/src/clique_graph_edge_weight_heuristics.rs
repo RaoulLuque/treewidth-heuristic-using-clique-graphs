@@ -2,7 +2,7 @@ use std::{collections::HashSet, hash::BuildHasher};
 
 use petgraph::graph::NodeIndex;
 
-pub fn neutral_heuristic(_: &HashSet<NodeIndex>, _: &HashSet<NodeIndex>) -> i32 {
+pub fn neutral_heuristic<S>(_: &HashSet<NodeIndex, S>, _: &HashSet<NodeIndex, S>) -> i32 {
     0
 }
 

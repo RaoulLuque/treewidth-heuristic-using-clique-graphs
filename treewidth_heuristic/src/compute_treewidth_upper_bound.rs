@@ -7,7 +7,7 @@ use crate::*;
 use itertools::Itertools;
 use petgraph::{graph::NodeIndex, Graph, Undirected};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum TreewidthComputationMethod {
     MSTAndFill,
     MSTAndUseTreeStructure,
@@ -217,23 +217,68 @@ mod tests {
 
     #[test]
     fn test_treewidth_heuristic_and_check_result_neutral_weight_heuristic() {
-        for i in vec![0, 2] {
-            let test_graph = setup_test_graph(i);
-            let computed_treewidth = compute_treewidth_upper_bound_not_connected::<_, _, RandomState>(
-                &test_graph.graph,
-                neutral_heuristic,
-                TreewidthComputationMethod::MSTAndUseTreeStructure,
-                false,
-            );
-            assert_eq!(computed_treewidth, test_graph.treewidth);
+        for i in 0..3 {
+            for computation_method in COMPUTATION_METHODS {
+                let test_graph = setup_test_graph(i);
+                let computed_treewidth = compute_treewidth_upper_bound_not_connected::<
+                    _,
+                    _,
+                    std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
+                >(
+                    &test_graph.graph,
+                    neutral_heuristic,
+                    computation_method,
+                    false,
+                );
+                assert_eq!(computed_treewidth, test_graph.treewidth);
+            }
+        }
+    }
 
-            let computed_treewidth = compute_treewidth_upper_bound_not_connected::<_, _, RandomState>(
-                &test_graph.graph,
-                neutral_heuristic,
-                TreewidthComputationMethod::MSTAndFill,
-                false,
-            );
-            assert_eq!(computed_treewidth, test_graph.treewidth);
+    #[test]
+    #[should_panic]
+    fn test_treewidth_heuristic_and_check_result_negative_intersection_weight_heuristic() {
+        for i in 0..3 {
+            for computation_method in COMPUTATION_METHODS {
+                let test_graph = setup_test_graph(i);
+                let computed_treewidth = compute_treewidth_upper_bound_not_connected::<
+                    _,
+                    _,
+                    std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
+                >(
+                    &test_graph.graph,
+                    negative_intersection_heuristic,
+                    computation_method,
+                    false,
+                );
+                assert_eq!(
+                    computed_treewidth,
+                    test_graph.treewidth,
+                    "computation method: {:?}. Test graph {:?}",
+                    computation_method,
+                    i + 1
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn test_treewidth_heuristic_and_check_result_least_difference_weight_heuristic() {
+        for i in 0..3 {
+            for computation_method in COMPUTATION_METHODS {
+                let test_graph = setup_test_graph(i);
+                let computed_treewidth = compute_treewidth_upper_bound_not_connected::<
+                    _,
+                    _,
+                    std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
+                >(
+                    &test_graph.graph,
+                    least_difference_heuristic,
+                    computation_method,
+                    false,
+                );
+                assert_eq!(computed_treewidth, test_graph.treewidth);
+            }
         }
     }
 }

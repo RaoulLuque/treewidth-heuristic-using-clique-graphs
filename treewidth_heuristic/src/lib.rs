@@ -73,6 +73,12 @@ pub(crate) mod tests {
         pub expected_connected_components: Vec<Vec<NodeIndex>>,
     }
 
+    pub const COMPUTATION_METHODS: [TreewidthComputationMethod; 3] = [
+        TreewidthComputationMethod::FillWhilstMST,
+        TreewidthComputationMethod::MSTAndFill,
+        TreewidthComputationMethod::MSTAndUseTreeStructure,
+    ];
+
     /// Sets up test graph:
     ///
     /// Test graph 0 has:
@@ -307,29 +313,28 @@ pub(crate) mod tests {
     fn test_graph_on_all_heuristics<N: Clone, E: Clone>(
         graph: Graph<N, E, petgraph::prelude::Undirected>,
         expected_treewidth: usize,
+        msg: &str,
     ) {
-        for computation_method in vec![
-            TreewidthComputationMethod::FillWhilstMST,
-            TreewidthComputationMethod::MSTAndUseTreeStructure,
-            TreewidthComputationMethod::MSTAndFill,
-        ]
-        .iter()
-        {
+        for computation_method in COMPUTATION_METHODS {
             let treewidth = compute_treewidth_upper_bound_not_connected(
                 &graph,
                 negative_intersection_heuristic::<std::hash::RandomState>,
-                *computation_method,
+                computation_method,
                 true,
             );
-            assert_eq!(treewidth, expected_treewidth);
+            assert_eq!(treewidth, expected_treewidth, "{}", msg);
 
             let treewidth = compute_treewidth_upper_bound_not_connected(
                 &graph,
                 least_difference_heuristic::<std::hash::RandomState>,
-                *computation_method,
+                computation_method,
                 true,
             );
-            assert_eq!(treewidth, expected_treewidth);
+            assert_eq!(
+                treewidth, expected_treewidth,
+                "{} computation method: {:?}",
+                msg, computation_method
+            );
         }
     }
 
@@ -347,7 +352,7 @@ pub(crate) mod tests {
             let k_tree: Graph<i32, i32, petgraph::prelude::Undirected> =
                 generate_k_tree(k, n).expect("k should be smaller or eq to n");
 
-            test_graph_on_all_heuristics(k_tree, k);
+            test_graph_on_all_heuristics(k_tree, k, &format!("k_tree with n: {} and k: {}", n, k));
         }
     }
 }
