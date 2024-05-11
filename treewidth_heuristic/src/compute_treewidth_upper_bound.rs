@@ -48,6 +48,29 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
         clique_graph_tree_before_filling,
         clique_graph,
     ) = match treewidth_computation_method {
+        TreewidthComputationMethod::MSTAndFill => {
+            let clique_graph: Graph<_, _, _> =
+                construct_clique_graph(cliques, edge_weight_heuristic);
+
+            let mut clique_graph_tree: Graph<
+                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                i32,
+                petgraph::prelude::Undirected,
+            > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
+                &clique_graph,
+            ));
+            let clique_graph_tree_before_filling = clique_graph_tree.clone();
+
+            fill_bags_along_paths(&mut clique_graph_tree);
+
+            (
+                clique_graph_tree,
+                None,
+                None,
+                Some(clique_graph_tree_before_filling),
+                clique_graph,
+            )
+        }
         TreewidthComputationMethod::MSTAndUseTreeStructure => {
             let (clique_graph, clique_graph_map) =
                 construct_clique_graph_with_bags(cliques, edge_weight_heuristic);
@@ -90,29 +113,6 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
                 clique_graph_tree,
                 Some(clique_graph_map),
                 Some(predecessor_map),
-                Some(clique_graph_tree_before_filling),
-                clique_graph,
-            )
-        }
-        TreewidthComputationMethod::MSTAndFill => {
-            let clique_graph: Graph<_, _, _> =
-                construct_clique_graph(cliques, edge_weight_heuristic);
-
-            let mut clique_graph_tree: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                i32,
-                petgraph::prelude::Undirected,
-            > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
-                &clique_graph,
-            ));
-            let clique_graph_tree_before_filling = clique_graph_tree.clone();
-
-            fill_bags_along_paths(&mut clique_graph_tree);
-
-            (
-                clique_graph_tree,
-                None,
-                None,
                 Some(clique_graph_tree_before_filling),
                 clique_graph,
             )
