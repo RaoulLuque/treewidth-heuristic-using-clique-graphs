@@ -7,7 +7,10 @@ use petgraph::dot::{Config, Dot};
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
 use std::time::SystemTime;
-use treewidth_heuristic::{compute_treewidth_upper_bound, TreewidthComputationMethod};
+use treewidth_heuristic::compute_treewidth_upper_bound_not_connected;
+
+// Use imports for benchmarking from dimacs_benchmarks crate
+use dimacs_benchmarks::*;
 
 // Debug version
 #[cfg(debug_assertions)]
@@ -17,127 +20,146 @@ type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
 #[cfg(not(debug_assertions))]
 type Hasher = std::hash::RandomState;
 
+/// First coordinate is the n, second k, third p
+pub const PARTIAL_K_TREE_CONFIGURATIONS: [(usize, usize, usize); 18] = [
+    (100, 10, 30),
+    (100, 20, 30),
+    (100, 10, 40),
+    (100, 20, 40),
+    (100, 10, 50),
+    (100, 20, 50),
+    (200, 10, 30),
+    (200, 20, 30),
+    (200, 10, 40),
+    (200, 20, 40),
+    (200, 10, 50),
+    (200, 20, 50),
+    (500, 10, 30),
+    (500, 20, 30),
+    (500, 10, 40),
+    (500, 20, 40),
+    (500, 10, 50),
+    (500, 20, 50),
+];
+
 fn main() {
-    let k = 10;
-    let n = 100;
-    let p = 10;
-    let edge_heuristic = treewidth_heuristic::least_difference_heuristic::<Hasher>;
-    let number_of_trees = 100;
-    let computation_type = TreewidthComputationMethod::FillWhilstMST;
-
-    let mut sum_of_treewidths_predecessors = 0;
-    let mut sum_of_treewidths_no_predecessors = 0;
-
-    // Opening and writing to log file
+    // Opening log file
     let mut benchmark_log_file =
         File::create("k_tree_benchmarks/benchmark_results/k_tree_results.txt")
             .expect("Dimacs log file should be creatable");
 
-    for i in 0..number_of_trees {
-        let graph: Graph<i32, i32, petgraph::prelude::Undirected> =
-            treewidth_heuristic::generate_partial_k_tree_with_guaranteed_treewidth(
-                k,
-                n,
-                p,
-                &mut rand::thread_rng(),
-            )
-            .expect("n should be greater than k");
+    let number_of_repetitions_per_heuristic = 10;
 
-        println!("Starting calculation on graph number: {:?}", i);
-        // Time the calculation
-        let start = SystemTime::now();
-        let (
-            clique_graph,
-            clique_graph_tree_after_filling_up,
-            clique_graph_tree_before_filling_up,
-            _,
-            _,
-            computed_treewidth,
-        ) = compute_treewidth_upper_bound(&graph, edge_heuristic, computation_type, true);
+    for (n, k, p) in PARTIAL_K_TREE_CONFIGURATIONS {
+        let number_of_trees = 100;
 
-        // DEBUG
-        let (
-            clique_graph_alt,
-            clique_graph_tree_after_filling_up_alt,
-            clique_graph_tree_before_filling_up_alt,
-            _,
-            _,
-            computed_treewidth_alt,
-        ) = compute_treewidth_upper_bound(
-            &graph,
-            edge_heuristic,
-            TreewidthComputationMethod::MSTAndFill,
-            true,
-        );
+        println!("Starting calculation on graph: {:?}", (n, k, p));
+        let mut calculation_vec = Vec::new();
 
-        // DEBUG
-        // assert!(petgraph::algo::is_isomorphic_matching(
-        //     &clique_graph,
-        //     &clique_graph_alt,
-        //     |a, b| a.eq(b),
-        //     |a, b| a.eq(b)
-        // ));
+        for i in 0..number_of_trees {
+            let graph: Graph<i32, i32, petgraph::prelude::Undirected> =
+                treewidth_heuristic::generate_partial_k_tree_with_guaranteed_treewidth(
+                    k,
+                    n,
+                    p,
+                    &mut rand::thread_rng(),
+                )
+                .expect("n should be greater than k");
 
-        sum_of_treewidths_no_predecessors += computed_treewidth_alt;
-        sum_of_treewidths_predecessors += computed_treewidth;
+            for heuristic_index in 0..HEURISTICS_BEING_TESTED.len() {
+                // Time the calculation
+                let start = SystemTime::now();
+                let mut treewidth: usize = usize::MAX;
+
+                let heuristic = &HEURISTICS_BEING_TESTED[heuristic_index];
+                let edge_weight_heuristic = heuristic_to_edge_weight_heuristic(heuristic);
+                let computation_type = heuristic_to_computation_type(heuristic);
+
+                for _ in 0..number_of_repetitions_per_heuristic {
+                    let computed_treewidth = match edge_weight_heuristic {
+                        EdgeWeightTypes::ReturnI32(a) => {
+                            compute_treewidth_upper_bound_not_connected::<_, _, Hasher, _>(
+                                &graph,
+                                a,
+                                computation_type,
+                                false,
+                            )
+                        }
+                        EdgeWeightTypes::ReturnI32Tuple(a) => {
+                            compute_treewidth_upper_bound_not_connected::<_, _, Hasher, _>(
+                                &graph,
+                                a,
+                                computation_type,
+                                false,
+                            )
+                        }
+                    };
+
+                    if computed_treewidth < treewidth {
+                        treewidth = computed_treewidth;
+                    }
+                }
+
+                if i == 0 {
+                    calculation_vec.push((
+                        treewidth,
+                        start
+                            .elapsed()
+                            .expect("Time should be trackable")
+                            .as_millis()
+                            / number_of_repetitions_per_heuristic,
+                    ))
+                } else {
+                    let (treewidth_sum, time_sum) = calculation_vec
+                        .get(heuristic_index)
+                        .expect("Values for calculation should exist");
+                    calculation_vec[heuristic_index] = (
+                        treewidth_sum + treewidth,
+                        time_sum
+                            + start
+                                .elapsed()
+                                .expect("Time should be trackable")
+                                .as_millis()
+                                / number_of_repetitions_per_heuristic,
+                    );
+                }
+            }
+        }
+        let calculation_vec: Vec<(f32, f32)> = calculation_vec
+            .iter()
+            .map(|(treewidth_sum, time_sum)| {
+                (
+                    *treewidth_sum as f32 / number_of_trees as f32,
+                    *time_sum as f32 / number_of_trees as f32,
+                )
+            })
+            .collect();
+
+        let mut log = format!("");
+
+        log.push_str(&format!("n: {} | k: {} | p: {} \n", n, k, p));
+
+        log.push_str(&format!(
+            "| {0: <10} | {1: <10} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10} | \n",
+            "MTrNi", "FiWhNi", "MTrLd", "FillWhLd", "MTrNiTLd", "FiWhNiTLd", "MTrLdTNi", "FiWhLdTNi",
+        ));
+
+        log.push_str("|");
+        for i in 0..HEURISTICS_BEING_TESTED.len() {
+            let current_value_tuple = calculation_vec.get(i).expect("Calculation should exist");
+            log.push_str(&format!(
+                "{: <4} {: <7}|",
+                format!("{:.1}", current_value_tuple.0),
+                format!("{:.1}", current_value_tuple.1)
+            ));
+        }
+
+        log.push_str("\n \n");
 
         benchmark_log_file
-            .write_all(
-                format!(
-                    "Graph {:?}: {} {} took {:.3} milliseconds\n",
-                    i,
-                    computed_treewidth,
-                    computed_treewidth_alt,
-                    start
-                        .elapsed()
-                        .expect("Time should be trackable")
-                        .as_millis()
-                )
-                .as_bytes(),
-            )
+            .write_all(log.as_bytes())
             .expect("Writing to Dimacs log file should be possible");
-
-        // Debug
-        // if i == 0 {
-        //     println!(
-        //         "Predecessor map first graph: \n {:?}",
-        //         predecessor_map.unwrap()
-        //     );
-        //     println!(
-        //         "Clique graph map first graph: \n {:?}",
-        //         clique_graph_map.unwrap()
-        //     );
-        // }
-
-        create_dot_files(
-            &graph,
-            &clique_graph,
-            &clique_graph_tree_after_filling_up,
-            &clique_graph_tree_before_filling_up,
-            i,
-            "",
-        );
-
-        // DEBUG
-        // create_dot_files(
-        //     &graph,
-        //     &clique_graph_alt,
-        //     &clique_graph_tree_after_filling_up_alt,
-        //     &clique_graph_tree_before_filling_up_alt,
-        //     i,
-        //     "no_predecessors",
-        // );
     }
-    benchmark_log_file
-        .write_all(
-            format!(
-                "Predecessors averaged: {:.2}; No Predecessors Average: {:.2}",
-                sum_of_treewidths_predecessors as f32 / number_of_trees as f32,
-                sum_of_treewidths_no_predecessors as f32 / number_of_trees as f32,
-            )
-            .as_bytes(),
-        )
-        .expect("Writing to Dimacs log file should be possible");
 }
 
 // Converting dot files to pdf in bulk:

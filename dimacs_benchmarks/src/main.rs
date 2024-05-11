@@ -1,15 +1,11 @@
 use dimacs_petgraph_parser::read_graph;
-use petgraph::graph::NodeIndex;
-use std::collections::HashSet;
 use std::fs::{self, File};
-use std::hash::BuildHasher;
 use std::io::Write;
 
+use dimacs_benchmarks::*;
 use petgraph::Graph;
 use std::time::SystemTime;
-use treewidth_heuristic::{
-    compute_treewidth_upper_bound_not_connected, TreewidthComputationMethod,
-};
+use treewidth_heuristic::compute_treewidth_upper_bound_not_connected;
 
 // Debug version
 #[cfg(debug_assertions)]
@@ -18,41 +14,6 @@ type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
 // Non-debug version
 #[cfg(not(debug_assertions))]
 type Hasher = std::hash::RandomState;
-
-#[derive(Debug)]
-#[allow(dead_code)]
-enum HeuristicTypes {
-    // MstTree = Minimum spanning tree then fill using tree structure
-    // FillWhile = Fill while building minimum spanning tree
-    // Ni = Negative Intersection
-    MstTreeNi,
-    FillWhileNi,
-    // Ld = Least difference
-    MstTreeLd,
-    FillWhileLd,
-    // T = Then
-    MstTreeNiTLd,
-    FillWhileNiTLd,
-    MstTreeLdTNi,
-    FillWhileLdTNi,
-}
-
-enum EdgeWeightTypes<S> {
-    ReturnI32(fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32),
-    ReturnI32Tuple(fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> (i32, i32)),
-}
-
-use HeuristicTypes::*;
-const HEURISTICS_BEING_TEST: [HeuristicTypes; 8] = [
-    MstTreeNi,
-    FillWhileNi,
-    MstTreeLd,
-    FillWhileLd,
-    MstTreeNiTLd,
-    FillWhileNiTLd,
-    MstTreeLdTNi,
-    FillWhileLdTNi,
-];
 
 fn main() {
     env_logger::init();
@@ -80,9 +41,8 @@ fn main() {
     benchmark_log_file
         .write_all(
             format!(
-                "| {0: <20} | {1: <12} | {2: <12} | {3: <12} | {4: <12} | {5: <12} | {6: <12} | {7: <12} | {8: <12} | {9: <12} | \n",
-                "Graph name", "Upper bound", "MSTTreeNi", "FillWhileNi", "MSTTreeLd", "FillWhileLd", "MstTreeNiTLd", "FillWhileNiTLd",
-                "MstTreeLdTNi", "FillWhileLdTNi",
+                "| {0: <20} | {1: <12} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10} | {8: <10} | {9: <10} | \n",
+                "Graph name", "Upper bound", "MTrNi", "FiWhNi", "MTrLd", "FillWhLd", "MTrNiTLd", "FiWhNiTLd", "MTrLdTNi", "FiWhLdTNi",
             )
             .as_bytes(),
         )
@@ -98,7 +58,7 @@ fn main() {
 
         println!("Starting calculation on graph: {:?}", graph_file_name);
         let mut calculation_vec = Vec::new();
-        for heuristic in HEURISTICS_BEING_TEST {
+        for heuristic in HEURISTICS_BEING_TESTED {
             // Time the calculation
             let start = SystemTime::now();
             let mut treewidth: usize = usize::MAX;
@@ -155,10 +115,10 @@ fn main() {
             }
         ));
 
-        for i in 0..HEURISTICS_BEING_TEST.len() {
+        for i in 0..HEURISTICS_BEING_TESTED.len() {
             let current_value_tuple = calculation_vec.get(i).expect("Calculation should exist");
             log.push_str(&format!(
-                "{0: <4} {1: <8} |",
+                "{0: <4} {1: <7}|",
                 current_value_tuple.0, current_value_tuple.1
             ));
         }
@@ -168,44 +128,5 @@ fn main() {
         benchmark_log_file
             .write_all(log.as_bytes())
             .expect("Writing to Dimacs log file should be possible");
-    }
-}
-
-fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
-    heuristic: &HeuristicTypes,
-) -> EdgeWeightTypes<S> {
-    use treewidth_heuristic::*;
-    use HeuristicTypes::*;
-    match heuristic {
-        MstTreeNi => EdgeWeightTypes::ReturnI32(negative_intersection_heuristic),
-        FillWhileNi => EdgeWeightTypes::ReturnI32(negative_intersection_heuristic),
-        MstTreeLd => EdgeWeightTypes::ReturnI32(least_difference_heuristic),
-        FillWhileLd => EdgeWeightTypes::ReturnI32(least_difference_heuristic),
-        MstTreeLdTNi => {
-            EdgeWeightTypes::ReturnI32Tuple(least_difference_then_negative_intersection_heuristic)
-        }
-        FillWhileLdTNi => {
-            EdgeWeightTypes::ReturnI32Tuple(least_difference_then_negative_intersection_heuristic)
-        }
-        MstTreeNiTLd => {
-            EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
-        }
-        FillWhileNiTLd => {
-            EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
-        }
-    }
-}
-
-fn heuristic_to_computation_type(heuristic: &HeuristicTypes) -> TreewidthComputationMethod {
-    use TreewidthComputationMethod::*;
-    match heuristic {
-        MstTreeNi => MSTAndUseTreeStructure,
-        FillWhileNi => FillWhilstMST,
-        MstTreeLd => MSTAndUseTreeStructure,
-        FillWhileLd => FillWhilstMST,
-        MstTreeLdTNi => MSTAndUseTreeStructure,
-        FillWhileLdTNi => FillWhilstMST,
-        MstTreeNiTLd => MSTAndUseTreeStructure,
-        FillWhileNiTLd => FillWhilstMST,
     }
 }

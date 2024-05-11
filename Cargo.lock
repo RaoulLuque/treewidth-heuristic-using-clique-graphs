@@ -186,6 +186,7 @@ dependencies = [
 name = "k_tree_benchmarks"
 version = "0.1.0"
 dependencies = [
+ "dimacs_benchmarks",
  "petgraph",
  "rand",
  "rustc-hash",
