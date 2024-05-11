@@ -6,7 +6,6 @@ pub fn neutral_heuristic<S>(_: &HashSet<NodeIndex, S>, _: &HashSet<NodeIndex, S>
     0
 }
 
-// Classic
 pub fn negative_intersection_heuristic<S: BuildHasher + Default>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,
@@ -44,7 +43,6 @@ pub fn union_heuristic<S: BuildHasher + Default>(
         .len() as i32
 }
 
-// Classic alt?
 pub fn least_difference_heuristic<S: BuildHasher + Default>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,
@@ -53,4 +51,24 @@ pub fn least_difference_heuristic<S: BuildHasher + Default>(
         .symmetric_difference(second_vertex)
         .collect::<HashSet<_, S>>()
         .len() as i32
+}
+
+pub fn negative_intersection_then_least_difference_heuristic<S: BuildHasher + Default>(
+    first_vertex: &HashSet<NodeIndex, S>,
+    second_vertex: &HashSet<NodeIndex, S>,
+) -> (i32, i32) {
+    (
+        negative_intersection_heuristic(first_vertex, second_vertex),
+        least_difference_heuristic(first_vertex, second_vertex),
+    )
+}
+
+pub fn least_difference_then_negative_intersection_heuristic<S: BuildHasher + Default>(
+    first_vertex: &HashSet<NodeIndex, S>,
+    second_vertex: &HashSet<NodeIndex, S>,
+) -> (i32, i32) {
+    (
+        least_difference_heuristic(first_vertex, second_vertex),
+        negative_intersection_heuristic(first_vertex, second_vertex),
+    )
 }
