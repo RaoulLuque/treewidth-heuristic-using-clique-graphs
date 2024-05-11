@@ -141,12 +141,11 @@ fn main() {
 
         log.push_str(&format!("n: {} | k: {} | p: {} \n", n, k, p));
 
-        log.push_str(&format!(
-            "| {0: <10} | {1: <10} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10} | \n",
-            "MTrNi", "FiWhNi", "MTrLd", "FillWhLd", "MTrNiTLd", "FiWhNiTLd", "MTrLdTNi", "FiWhLdTNi",
-        ));
+        for heuristic in HEURISTICS_BEING_TESTED {
+            log.push_str(&format!("| {: <10} ", heuristic))
+        }
 
-        log.push_str("|");
+        log.push_str("|\n|");
         for i in 0..HEURISTICS_BEING_TESTED.len() {
             let current_value_tuple = calculation_vec.get(i).expect("Calculation should exist");
             log.push_str(&format!(
