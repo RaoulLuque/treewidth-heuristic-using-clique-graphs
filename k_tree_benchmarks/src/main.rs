@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::fmt::Debug;
 use std::fs::{self, File};
 use std::io::Write;
 
@@ -141,16 +142,16 @@ fn main() {
 
 // Converting dot files to pdf in bulk:
 // FullPath -type f -name "*.dot" | xargs dot -Tpdf -O
-fn create_dot_files<S>(
+fn create_dot_files<O: Debug, S>(
     graph: &Graph<i32, i32, petgraph::prelude::Undirected>,
-    clique_graph: &Graph<HashSet<NodeIndex, S>, Vec<i32>, petgraph::prelude::Undirected>,
+    clique_graph: &Graph<HashSet<NodeIndex, S>, O, petgraph::prelude::Undirected>,
     clique_graph_tree_after_filling_up: &Graph<
         HashSet<NodeIndex, S>,
-        Vec<i32>,
+        O,
         petgraph::prelude::Undirected,
     >,
     clique_graph_tree_before_filling_up: &Option<
-        Graph<HashSet<NodeIndex, S>, Vec<i32>, petgraph::prelude::Undirected>,
+        Graph<HashSet<NodeIndex, S>, O, petgraph::prelude::Undirected>,
     >,
     i: usize,
     name: &str,

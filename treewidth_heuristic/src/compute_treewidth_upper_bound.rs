@@ -1,5 +1,6 @@
 use std::{
     collections::{HashMap, HashSet},
+    fmt::Debug,
     hash::BuildHasher,
 };
 
@@ -23,15 +24,20 @@ pub enum TreewidthComputationMethod {
 /// Can also check the tree decomposition for correctness after computation which will up to double
 /// the running time. If so, will panic if the tree decomposition if incorrect returning the vertices
 /// and path that is faulty.
-pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHasher + Clone>(
+pub fn compute_treewidth_upper_bound<
+    N: Clone,
+    E: Clone,
+    O: Clone + Ord + Default + Debug,
+    S: Default + BuildHasher + Clone,
+>(
     graph: &Graph<N, E, Undirected>,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> Vec<i32>,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
     treewidth_computation_method: TreewidthComputationMethod,
     check_tree_decomposition_bool: bool,
 ) -> (
-    Graph<HashSet<NodeIndex, S>, Vec<i32>, Undirected>,
-    Graph<HashSet<NodeIndex, S>, Vec<i32>, Undirected>,
-    Option<Graph<HashSet<NodeIndex, S>, Vec<i32>, Undirected>>,
+    Graph<HashSet<NodeIndex, S>, O, Undirected>,
+    Graph<HashSet<NodeIndex, S>, O, Undirected>,
+    Option<Graph<HashSet<NodeIndex, S>, O, Undirected>>,
     Option<HashMap<NodeIndex, (NodeIndex, usize), S>>,
     Option<HashMap<NodeIndex, HashSet<NodeIndex, S>, S>>,
     usize,
@@ -54,7 +60,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
 
             let mut clique_graph_tree: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                Vec<i32>,
+                O,
                 petgraph::prelude::Undirected,
             > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
                 &clique_graph,
@@ -79,7 +85,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
 
             let mut clique_graph_tree: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                Vec<i32>,
+                O,
                 petgraph::prelude::Undirected,
             > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
                 &clique_graph,
@@ -89,7 +95,7 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
             // DEBUG
             let clique_graph_tree_copy: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                Vec<i32>,
+                O,
                 petgraph::prelude::Undirected,
             > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
                 &clique_graph,
@@ -123,9 +129,9 @@ pub fn compute_treewidth_upper_bound<N: Clone, E: Clone, S: Default + BuildHashe
 
             let clique_graph_tree: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                Vec<i32>,
+                O,
                 petgraph::prelude::Undirected,
-            > = fill_bags_while_generating_mst::<N, E, S>(
+            > = fill_bags_while_generating_mst::<N, E, O, S>(
                 &clique_graph,
                 edge_weight_heuristic,
                 clique_graph_map,
@@ -161,9 +167,10 @@ pub fn compute_treewidth_upper_bound_not_connected<
     N: Clone,
     E: Clone,
     S: Default + BuildHasher + Clone,
+    O: Clone + Ord + Default + Debug,
 >(
     graph: &Graph<N, E, Undirected>,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> Vec<i32>,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
     treewidth_computation_method: TreewidthComputationMethod,
     check_tree_decomposition_bool: bool,
 ) -> usize {
@@ -199,14 +206,14 @@ mod tests {
     fn test_treewidth_heuristic_check_tree_decomposition() {
         for i in 0..3 {
             let test_graph = setup_test_graph(i);
-            let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState>(
+            let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState, _>(
                 &test_graph.graph,
                 neutral_heuristic,
                 TreewidthComputationMethod::MSTAndUseTreeStructure,
                 true,
             );
 
-            let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState>(
+            let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState, _>(
                 &test_graph.graph,
                 neutral_heuristic,
                 TreewidthComputationMethod::MSTAndFill,
@@ -224,6 +231,7 @@ mod tests {
                     _,
                     _,
                     std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
+                    _,
                 >(
                     &test_graph.graph,
                     neutral_heuristic,
@@ -245,6 +253,7 @@ mod tests {
                     _,
                     _,
                     std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
+                    _,
                 >(
                     &test_graph.graph,
                     negative_intersection_heuristic,
@@ -271,6 +280,7 @@ mod tests {
                     _,
                     _,
                     std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
+                    _,
                 >(
                     &test_graph.graph,
                     least_difference_heuristic,

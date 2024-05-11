@@ -14,11 +14,11 @@ use petgraph::{
 /// is valid, returns false otherwise.
 ///
 /// If predecessor map and clique graph map are passed, gives additional in the case that it is a faulty tree decomposition.
-pub fn check_tree_decomposition<N, E, S: BuildHasher + Default>(
+pub fn check_tree_decomposition<N, E, O, S: BuildHasher + Default>(
     starting_graph: &Graph<N, E, Undirected>,
     tree_decomposition_graph: &Graph<
         std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-        Vec<i32>,
+        O,
         petgraph::prelude::Undirected,
     >,
     predecessor_map: &Option<HashMap<NodeIndex, (NodeIndex, usize), S>>,

@@ -347,7 +347,8 @@ pub(crate) mod tests {
             let mut rng = rand::thread_rng();
 
             let k: usize = (rng.gen::<f32>() * 50.0) as usize;
-            let n: usize = (rng.gen::<f32>() * 100.0) as usize + k;
+            // n should be strictly greater than k otherwise k_tree has not guaranteed treewidth k
+            let n: usize = (rng.gen::<f32>() * 100.0) as usize + k + 1;
 
             let k_tree: Graph<i32, i32, petgraph::prelude::Undirected> =
                 generate_k_tree(k, n).expect("k should be smaller or eq to n");
