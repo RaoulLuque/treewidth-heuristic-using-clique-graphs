@@ -38,14 +38,18 @@ fn main() {
     }
     dimacs_graph_paths_vec.sort_by_key(|e| e.file_name());
 
+    let mut log = "".to_string();
+    log.push_str(&format!(
+        "| {: <20} | {: <12} |",
+        "Graph name", "Upper bound"
+    ));
+
+    for heuristic in HEURISTICS_BEING_TESTED {
+        log.push_str(&format!(" {: <10} |", heuristic))
+    }
+
     benchmark_log_file
-        .write_all(
-            format!(
-                "| {0: <20} | {1: <12} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10} | {8: <10} | {9: <10} | \n",
-                "Graph name", "Upper bound", "MTrNi", "FiWhNi", "MTrLd", "FillWhLd", "MTrNiTLd", "FiWhNiTLd", "MTrLdTNi", "FiWhLdTNi",
-            )
-            .as_bytes(),
-        )
+        .write_all(log.as_bytes())
         .expect("Writing to Dimacs log file should be possible");
 
     for graph_path in dimacs_graph_paths_vec {

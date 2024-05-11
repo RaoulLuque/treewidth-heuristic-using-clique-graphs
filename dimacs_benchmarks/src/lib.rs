@@ -15,12 +15,28 @@ pub enum HeuristicTypes {
     FillWhileLdTNi,
 }
 
+impl std::fmt::Display for HeuristicTypes {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let display_string = match self {
+            MstTreeNi => "MTrNi",
+            FillWhileNi => "FiWhNi",
+            MstTreeLd => "MTrLd",
+            FillWhileLd => "FiWhLd",
+            MstTreeNiTLd => "MTrNiTLd",
+            FillWhileNiTLd => "FiWhNiTLd",
+            MstTreeLdTNi => "MTrLdTNi",
+            FillWhileLdTNi => "FiWhLdTNi",
+        };
+        write!(f, "{}", display_string)
+    }
+}
+
 pub enum EdgeWeightTypes<S> {
     ReturnI32(fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32),
     ReturnI32Tuple(fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> (i32, i32)),
 }
 
-use std::{collections::HashSet, hash::BuildHasher};
+use std::{collections::HashSet, hash::BuildHasher, path::Display};
 
 use petgraph::graph::NodeIndex;
 use HeuristicTypes::*;
