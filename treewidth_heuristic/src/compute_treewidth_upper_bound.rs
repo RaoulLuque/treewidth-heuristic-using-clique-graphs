@@ -244,9 +244,8 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_treewidth_heuristic_and_check_result_negative_intersection_weight_heuristic() {
-        for i in 0..3 {
+        for i in vec![0, 2] {
             for computation_method in COMPUTATION_METHODS {
                 let test_graph = setup_test_graph(i);
                 let computed_treewidth = compute_treewidth_upper_bound_not_connected::<
@@ -261,14 +260,37 @@ mod tests {
                     false,
                 );
                 assert_eq!(
-                    computed_treewidth,
-                    test_graph.treewidth,
+                    computed_treewidth, test_graph.treewidth,
                     "computation method: {:?}. Test graph {:?}",
-                    computation_method,
-                    i + 1
+                    computation_method, i
                 );
             }
         }
+    }
+
+    #[test]
+    #[should_panic]
+    fn negative_intersection_weight_heuristic_fails_on_first_test_graph() {
+        let i = 1;
+        let computation_method = TreewidthComputationMethod::MSTAndUseTreeStructure;
+
+        let test_graph = setup_test_graph(i);
+        let computed_treewidth = compute_treewidth_upper_bound_not_connected::<
+            _,
+            _,
+            std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
+            _,
+        >(
+            &test_graph.graph,
+            negative_intersection_heuristic,
+            computation_method,
+            false,
+        );
+        assert_eq!(
+            computed_treewidth, test_graph.treewidth,
+            "computation method: {:?}. Test graph {:?}",
+            computation_method, i
+        );
     }
 
     #[test]
