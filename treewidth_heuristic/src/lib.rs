@@ -12,23 +12,24 @@ mod generate_partial_k_tree;
 mod maximum_minimum_degree_heuristic;
 
 // Imports for using the library
-pub use check_tree_decomposition::check_tree_decomposition;
+pub(crate) use check_tree_decomposition::check_tree_decomposition;
 pub use clique_graph_edge_weight_heuristics::*;
 pub use compute_treewidth_upper_bound::{
     compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
     TreewidthComputationMethod,
 };
-pub use construct_clique_graph::{construct_clique_graph, construct_clique_graph_with_bags};
-pub use fill_bags_along_paths::{fill_bags_along_paths, fill_bags_along_paths_using_structure};
-pub use fill_bags_while_generating_mst::fill_bags_while_generating_mst;
-pub use find_connected_components::find_connected_components;
-pub use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
-pub use find_path_in_tree::find_path_in_tree;
-pub use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
+pub(crate) use construct_clique_graph::{construct_clique_graph, construct_clique_graph_with_bags};
+pub(crate) use fill_bags_along_paths::{
+    fill_bags_along_paths, fill_bags_along_paths_using_structure,
+};
+pub(crate) use fill_bags_while_generating_mst::fill_bags_while_generating_mst;
+pub(crate) use find_connected_components::find_connected_components;
+pub(crate) use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
+pub(crate) use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
 pub use generate_partial_k_tree::{
     generate_partial_k_tree, generate_partial_k_tree_with_guaranteed_treewidth,
 };
-pub use maximum_minimum_degree_heuristic::maximum_minimum_degree;
+pub(crate) use maximum_minimum_degree_heuristic::maximum_minimum_degree;
 
 // Debug version
 #[cfg(debug_assertions)]
@@ -52,6 +53,8 @@ pub(crate) use hashset;
 #[cfg(test)]
 pub(crate) mod tests {
     use petgraph::{graph::NodeIndex, Graph};
+
+    use super::*;
 
     /// Struct for TestGraphs with necessary info for testing different functionalities
     ///
@@ -299,5 +302,52 @@ pub(crate) mod tests {
         }
 
         debug_assert!(test);
+    }
+
+    fn test_graph_on_all_heuristics<N: Clone, E: Clone>(
+        graph: Graph<N, E, petgraph::prelude::Undirected>,
+        expected_treewidth: usize,
+    ) {
+        for computation_method in vec![
+            TreewidthComputationMethod::FillWhilstMST,
+            TreewidthComputationMethod::MSTAndUseTreeStructure,
+            TreewidthComputationMethod::MSTAndFill,
+        ]
+        .iter()
+        {
+            let treewidth = compute_treewidth_upper_bound_not_connected(
+                &graph,
+                negative_intersection_heuristic::<std::hash::RandomState>,
+                *computation_method,
+                true,
+            );
+            assert_eq!(treewidth, expected_treewidth);
+
+            let treewidth = compute_treewidth_upper_bound_not_connected(
+                &graph,
+                least_difference_heuristic::<std::hash::RandomState>,
+                *computation_method,
+                true,
+            );
+            assert_eq!(treewidth, expected_treewidth);
+        }
+    }
+
+    #[test]
+    fn test_heuristic_on_k_tree() {
+        use crate::generate_partial_k_tree::generate_k_tree;
+        use rand::Rng;
+
+        for _ in 0..25 {
+            let mut rng = rand::thread_rng();
+
+            let k: usize = (rng.gen::<f32>() * 50.0) as usize;
+            let n: usize = (rng.gen::<f32>() * 100.0) as usize + k;
+
+            let k_tree: Graph<i32, i32, petgraph::prelude::Undirected> =
+                generate_k_tree(k, n).expect("k should be smaller or eq to n");
+
+            test_graph_on_all_heuristics(k_tree, k);
+        }
     }
 }

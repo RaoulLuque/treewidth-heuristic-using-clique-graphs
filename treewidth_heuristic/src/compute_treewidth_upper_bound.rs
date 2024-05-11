@@ -164,7 +164,7 @@ pub fn compute_treewidth_upper_bound_not_connected<
 >(
     graph: &Graph<N, E, Undirected>,
     edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> i32,
-    use_predecessor_map_to_fill_bags: TreewidthComputationMethod,
+    treewidth_computation_method: TreewidthComputationMethod,
     check_tree_decomposition_bool: bool,
 ) -> usize {
     let components = find_connected_components::<Vec<_>, _, _, S>(graph);
@@ -178,7 +178,7 @@ pub fn compute_treewidth_upper_bound_not_connected<
             compute_treewidth_upper_bound(
                 &subgraph,
                 edge_weight_heuristic,
-                use_predecessor_map_to_fill_bags,
+                treewidth_computation_method,
                 check_tree_decomposition_bool,
             )
             .5,

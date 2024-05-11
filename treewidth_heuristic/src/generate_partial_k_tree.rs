@@ -71,7 +71,7 @@ pub fn generate_partial_k_tree(
 
 /// Generates a [k-tree](https://en.wikipedia.org/wiki/K-tree) with n vertices and k in the definition.
 /// Returns None if k > n
-fn generate_k_tree(k: usize, n: usize) -> Option<Graph<i32, i32, Undirected>> {
+pub(crate) fn generate_k_tree(k: usize, n: usize) -> Option<Graph<i32, i32, Undirected>> {
     if k > n {
         None
     } else {
