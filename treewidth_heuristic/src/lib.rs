@@ -22,7 +22,9 @@ pub(crate) use construct_clique_graph::{construct_clique_graph, construct_clique
 pub(crate) use fill_bags_along_paths::{
     fill_bags_along_paths, fill_bags_along_paths_using_structure,
 };
-pub(crate) use fill_bags_while_generating_mst::fill_bags_while_generating_mst;
+pub(crate) use fill_bags_while_generating_mst::{
+    fill_bags_while_generating_mst, fill_bags_while_generating_mst_using_tree,
+};
 pub(crate) use find_connected_components::find_connected_components;
 pub(crate) use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
 pub(crate) use find_width_of_tree_decomposition::find_width_of_tree_decomposition;

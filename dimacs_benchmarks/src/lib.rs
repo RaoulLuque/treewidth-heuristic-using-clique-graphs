@@ -11,6 +11,7 @@ pub enum HeuristicTypes {
     // T = Then
     MstTreeNiTLd,
     FillWhileNiTLd,
+    FillWhileTreeNiTLd,
     MstTreeLdTNi,
     FillWhileLdTNi,
 }
@@ -26,6 +27,7 @@ impl std::fmt::Display for HeuristicTypes {
             FillWhileNiTLd => "FiWhNiTLd",
             MstTreeLdTNi => "MTrLdTNi",
             FillWhileLdTNi => "FiWhLdTNi",
+            FillWhileTreeNiTLd => "FWTNiTLd",
         };
         write!(f, "{}", display_string)
     }
@@ -36,20 +38,22 @@ pub enum EdgeWeightTypes<S> {
     ReturnI32Tuple(fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> (i32, i32)),
 }
 
-use std::{collections::HashSet, hash::BuildHasher, path::Display};
+use std::{collections::HashSet, hash::BuildHasher};
 
 use petgraph::graph::NodeIndex;
 use HeuristicTypes::*;
-pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 8] = [
-    MstTreeNi,
-    FillWhileNi,
-    MstTreeLd,
-    FillWhileLd,
-    MstTreeNiTLd,
-    FillWhileNiTLd,
-    MstTreeLdTNi,
-    FillWhileLdTNi,
-];
+// pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 8] = [
+//     MstTreeNi,
+//     FillWhileNi,
+//     MstTreeLd,
+//     FillWhileLd,
+//     MstTreeNiTLd,
+//     FillWhileNiTLd,
+//     MstTreeLdTNi,
+//     FillWhileLdTNi,
+// ];
+
+pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 3] = [MstTreeNi, MstTreeNiTLd, FillWhileNiTLd];
 
 pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
     heuristic: &HeuristicTypes,
@@ -73,6 +77,9 @@ pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
         FillWhileNiTLd => {
             EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
         }
+        FillWhileTreeNiTLd => {
+            EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
+        }
     }
 }
 
@@ -89,5 +96,6 @@ pub fn heuristic_to_computation_type(
         FillWhileLdTNi => FillWhilstMST,
         MstTreeNiTLd => MSTAndUseTreeStructure,
         FillWhileNiTLd => FillWhilstMST,
+        FillWhileTreeNiTLd => FillWhilstMSTTree,
     }
 }

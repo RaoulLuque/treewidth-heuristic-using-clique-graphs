@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use log::{debug, info};
-use petgraph::{algo::Measure, graph::NodeIndex, Graph};
+use petgraph::{graph::NodeIndex, Graph};
 use std::{
     cmp::Ordering,
     collections::{BTreeSet, HashMap, HashSet},
@@ -161,7 +161,7 @@ fn setup_predecessors<E, S: BuildHasher>(
     );
 }
 
-fn fill_bags_until_common_predecessor<E, S: BuildHasher>(
+pub fn fill_bags_until_common_predecessor<E, S: BuildHasher>(
     clique_graph: &mut Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
     predecessors_map: &HashMap<NodeIndex, (NodeIndex, usize), S>,
     vertex_in_initial_graph: &NodeIndex,

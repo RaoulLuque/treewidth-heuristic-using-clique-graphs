@@ -45,8 +45,9 @@ fn main() {
     ));
 
     for heuristic in HEURISTICS_BEING_TESTED {
-        log.push_str(&format!(" {: <10} |", heuristic))
+        log.push_str(&format!(" {: <11} |", heuristic))
     }
+    log.push_str("\n");
 
     benchmark_log_file
         .write_all(log.as_bytes())
