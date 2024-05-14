@@ -35,6 +35,7 @@ pub fn compute_treewidth_upper_bound<
     edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
     treewidth_computation_method: TreewidthComputationMethod,
     check_tree_decomposition_bool: bool,
+    clique_bound: Option<usize>,
 ) -> (
     Graph<HashSet<NodeIndex, S>, O, Undirected>,
     Graph<HashSet<NodeIndex, S>, O, Undirected>,
@@ -44,9 +45,15 @@ pub fn compute_treewidth_upper_bound<
     usize,
 ) {
     // Find cliques in initial graph
-    let cliques: Vec<Vec<_>> = find_maximum_cliques::<Vec<_>, _, S>(graph)
-        .sorted()
-        .collect();
+    let cliques: Vec<Vec<_>> = if let Some(k) = clique_bound {
+        find_maximum_cliques_bounded::<Vec<_>, _, S>(graph, k)
+            // .sorted()
+            .collect()
+    } else {
+        find_maximum_cliques::<Vec<_>, _, S>(graph)
+            // .sorted()
+            .collect()
+    };
 
     let (
         clique_graph_tree_after_filling_up,
@@ -190,6 +197,7 @@ pub fn compute_treewidth_upper_bound_not_connected<
     edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
     treewidth_computation_method: TreewidthComputationMethod,
     check_tree_decomposition_bool: bool,
+    clique_bound: Option<usize>,
 ) -> usize {
     let components = find_connected_components::<Vec<_>, _, _, S>(graph);
     let mut computed_treewidth: usize = 0;
@@ -204,6 +212,7 @@ pub fn compute_treewidth_upper_bound_not_connected<
                 edge_weight_heuristic,
                 treewidth_computation_method,
                 check_tree_decomposition_bool,
+                clique_bound,
             )
             .5,
         );
@@ -228,6 +237,7 @@ mod tests {
                 neutral_heuristic,
                 TreewidthComputationMethod::MSTAndUseTreeStructure,
                 true,
+                None,
             );
 
             let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState, _>(
@@ -235,6 +245,7 @@ mod tests {
                 neutral_heuristic,
                 TreewidthComputationMethod::MSTAndFill,
                 true,
+                None,
             );
         }
     }
@@ -254,6 +265,7 @@ mod tests {
                     neutral_heuristic,
                     computation_method,
                     false,
+                    None,
                 );
                 assert_eq!(computed_treewidth, test_graph.treewidth);
             }
@@ -275,6 +287,7 @@ mod tests {
                     negative_intersection_heuristic,
                     computation_method,
                     false,
+                    None,
                 );
                 assert_eq!(
                     computed_treewidth, test_graph.treewidth,
@@ -302,6 +315,7 @@ mod tests {
             negative_intersection_heuristic,
             computation_method,
             false,
+            None,
         );
         assert_eq!(
             computed_treewidth, test_graph.treewidth,
@@ -325,6 +339,7 @@ mod tests {
                     least_difference_heuristic,
                     computation_method,
                     false,
+                    None,
                 );
                 assert_eq!(computed_treewidth, test_graph.treewidth);
             }

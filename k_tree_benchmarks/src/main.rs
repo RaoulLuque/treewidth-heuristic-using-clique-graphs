@@ -71,6 +71,7 @@ fn main() {
                 let heuristic = &HEURISTICS_BEING_TESTED[heuristic_index];
                 let edge_weight_heuristic = heuristic_to_edge_weight_heuristic(heuristic);
                 let computation_type = heuristic_to_computation_type(heuristic);
+                let clique_bound = heuristic_to_clique_bound(heuristic);
 
                 for j in 0..number_of_repetitions_per_heuristic {
                     println!(
@@ -85,6 +86,7 @@ fn main() {
                                 a,
                                 computation_type,
                                 false,
+                                clique_bound,
                             )
                         }
                         EdgeWeightTypes::ReturnI32Tuple(a) => {
@@ -93,6 +95,7 @@ fn main() {
                                 a,
                                 computation_type,
                                 false,
+                                clique_bound,
                             )
                         }
                     };

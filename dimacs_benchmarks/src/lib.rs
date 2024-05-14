@@ -1,3 +1,5 @@
+use treewidth_heuristic::TreewidthComputationMethod::*;
+
 #[derive(Debug)]
 pub enum HeuristicTypes {
     // MstTree = Minimum spanning tree then fill using tree structure
@@ -53,7 +55,7 @@ use HeuristicTypes::*;
 //     FillWhileLdTNi,
 // ];
 
-pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 3] = [MstTreeNi, MstTreeNiTLd, FillWhileNiTLd];
+pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 2] = [MstTreeNi, MstTreeNiTLd]; //FillWhileNiTLd, FillWhileTreeNiTLd];
 
 pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
     heuristic: &HeuristicTypes,
@@ -86,7 +88,6 @@ pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
 pub fn heuristic_to_computation_type(
     heuristic: &HeuristicTypes,
 ) -> treewidth_heuristic::TreewidthComputationMethod {
-    use treewidth_heuristic::TreewidthComputationMethod::*;
     match heuristic {
         MstTreeNi => MSTAndUseTreeStructure,
         FillWhileNi => FillWhilstMST,
@@ -97,5 +98,19 @@ pub fn heuristic_to_computation_type(
         MstTreeNiTLd => MSTAndUseTreeStructure,
         FillWhileNiTLd => FillWhilstMST,
         FillWhileTreeNiTLd => FillWhilstMSTTree,
+    }
+}
+
+pub fn heuristic_to_clique_bound(heuristic: &HeuristicTypes) -> Option<usize> {
+    match heuristic {
+        MstTreeNi => None,
+        FillWhileNi => None,
+        MstTreeLd => None,
+        FillWhileLd => None,
+        MstTreeLdTNi => None,
+        FillWhileLdTNi => None,
+        MstTreeNiTLd => None,
+        FillWhileNiTLd => None,
+        FillWhileTreeNiTLd => None,
     }
 }

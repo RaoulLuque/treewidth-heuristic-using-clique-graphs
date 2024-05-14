@@ -323,6 +323,7 @@ pub(crate) mod tests {
                 negative_intersection_heuristic::<std::hash::RandomState>,
                 computation_method,
                 true,
+                None,
             );
             assert_eq!(treewidth, expected_treewidth, "{}", msg);
 
@@ -331,6 +332,7 @@ pub(crate) mod tests {
                 least_difference_heuristic::<std::hash::RandomState>,
                 computation_method,
                 true,
+                None,
             );
             assert_eq!(
                 treewidth, expected_treewidth,

@@ -13,12 +13,12 @@ type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
 
 // Non-debug version
 #[cfg(not(debug_assertions))]
-type Hasher = std::hash::RandomState;
+type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
 
 fn main() {
     env_logger::init();
 
-    let number_of_repetitions_per_heuristic = 10;
+    let number_of_repetitions_per_heuristic = 1;
 
     let mut benchmark_log_file =
         File::create("dimacs_benchmarks/benchmark_results/dimacs_results.txt")
@@ -40,12 +40,13 @@ fn main() {
 
     let mut log = "".to_string();
     log.push_str(&format!(
-        "| {: <20} | {: <12} |",
+        "| {0: <20} | {1: <12} |",
         "Graph name", "Upper bound"
     ));
 
     for heuristic in HEURISTICS_BEING_TESTED {
-        log.push_str(&format!(" {: <11} |", heuristic))
+        let heuristic_string = heuristic.to_string();
+        log.push_str(&format!(" {0: <11} |", heuristic_string))
     }
     log.push_str("\n");
 
@@ -70,24 +71,27 @@ fn main() {
 
             let edge_weight_heuristic = heuristic_to_edge_weight_heuristic(&heuristic);
             let computation_type = heuristic_to_computation_type(&heuristic);
+            let clique_bound = heuristic_to_clique_bound(&heuristic);
 
             for i in 0..number_of_repetitions_per_heuristic {
                 println!("Iteration: {} for heuristic: {:?}", i, heuristic);
                 let computed_treewidth = match edge_weight_heuristic {
-                    EdgeWeightTypes::ReturnI32(a) => {
+                    EdgeWeightTypes::ReturnI32(edge_weight_heuristic) => {
                         compute_treewidth_upper_bound_not_connected::<_, _, Hasher, _>(
                             &graph,
-                            a,
+                            edge_weight_heuristic,
                             computation_type,
                             false,
+                            clique_bound,
                         )
                     }
-                    EdgeWeightTypes::ReturnI32Tuple(a) => {
+                    EdgeWeightTypes::ReturnI32Tuple(edge_weight_heuristic) => {
                         compute_treewidth_upper_bound_not_connected::<_, _, Hasher, _>(
                             &graph,
-                            a,
+                            edge_weight_heuristic,
                             computation_type,
                             false,
+                            clique_bound,
                         )
                     }
                 };
@@ -123,7 +127,7 @@ fn main() {
         for i in 0..HEURISTICS_BEING_TESTED.len() {
             let current_value_tuple = calculation_vec.get(i).expect("Calculation should exist");
             log.push_str(&format!(
-                "{0: <4} {1: <7}|",
+                " {0: <4} {1: <7}|",
                 current_value_tuple.0, current_value_tuple.1
             ));
         }
