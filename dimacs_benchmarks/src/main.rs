@@ -13,12 +13,12 @@ type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
 
 // Non-debug version
 #[cfg(not(debug_assertions))]
-type Hasher = std::hash::BuildHasherDefault<rustc_hash::FxHasher>;
+type Hasher = std::hash::RandomState;
 
 fn main() {
     env_logger::init();
 
-    let number_of_repetitions_per_heuristic = 1;
+    let number_of_repetitions_per_heuristic = 10;
 
     let mut benchmark_log_file =
         File::create("dimacs_benchmarks/benchmark_results/dimacs_results.txt")
