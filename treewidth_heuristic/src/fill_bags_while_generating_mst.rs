@@ -85,6 +85,12 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
             .node_weight(new_vertex_res)
             .expect("Vertex should have weight since it was just added")
             .clone()
+            .difference(
+                &result_graph
+                    .node_weight(cheapest_vertex_res)
+                    .expect("Vertex should have bag as weight")
+                    .clone(),
+            )
         {
             if let Some(vertices_in_clique_graph) =
                 clique_graph_map.get(&vertex_from_starting_graph)
@@ -96,7 +102,7 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
                                 new_vertex_res,
                                 *vertex_res_graph,
                                 &mut result_graph,
-                                vertex_from_starting_graph,
+                                *vertex_from_starting_graph,
                             );
                         }
                     }
