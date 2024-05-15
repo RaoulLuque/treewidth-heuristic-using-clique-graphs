@@ -126,9 +126,9 @@ where
     TargetColl: FromIterator<G::NodeId>,
     <G as GraphBase>::NodeId: 'static,
 {
-    let mut maximum_cliques = find_maximum_cliques::<HashSet<_>, G, S>(graph);
-    let mut combinations = crate::hashset![].into_iter().combinations(k);
-    let mut seen_combinations = crate::hashset![];
+    let mut maximum_cliques = find_maximum_cliques::<HashSet<_, S>, G, S>(graph);
+    let mut combinations = HashSet::<_, S>::default().into_iter().combinations(k);
+    let mut seen_combinations = HashSet::<_, S>::default();
     from_fn(move || loop {
         if let Some(mut clique_combination) = combinations.next() {
             clique_combination.sort();
@@ -140,6 +140,9 @@ where
             if clique.len() <= k {
                 return Some(clique.into_iter().collect::<TargetColl>());
             } else {
+                if k != 2 {
+                    println!("Clique with size: {} bigger than {} found", clique.len(), k);
+                }
                 combinations = clique.into_iter().combinations(k);
             }
         } else {
