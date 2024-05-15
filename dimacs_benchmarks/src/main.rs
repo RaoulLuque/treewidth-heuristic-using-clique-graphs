@@ -18,7 +18,7 @@ type Hasher = std::hash::RandomState;
 fn main() {
     env_logger::init();
 
-    let number_of_repetitions_per_heuristic = 1;
+    let number_of_repetitions_per_heuristic = 3;
 
     let mut benchmark_log_file =
         File::create("dimacs_benchmarks/benchmark_results/dimacs_results.txt")
@@ -36,7 +36,7 @@ fn main() {
             }
         }
     }
-    dimacs_graph_paths_vec.sort_by_key(|e| e.file_name());
+    dimacs_graph_paths_vec.sort_by(|a, b| b.file_name().cmp(&a.file_name()));
 
     let mut log = "".to_string();
     log.push_str(&format!(
@@ -81,7 +81,7 @@ fn main() {
                             &graph,
                             edge_weight_heuristic,
                             computation_type,
-                            false,
+                            true,
                             clique_bound,
                         )
                     }
@@ -90,7 +90,7 @@ fn main() {
                             &graph,
                             edge_weight_heuristic,
                             computation_type,
-                            false,
+                            true,
                             clique_bound,
                         )
                     }
