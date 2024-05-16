@@ -40,78 +40,95 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
     node_index_map.insert(first_vertex_clique, first_vertex_res);
 
     while !clique_graph_remaining_vertices.is_empty() {
-        let (cheapest_vertex_res, cheapest_vertex_clique) = find_cheapest_vertex(
+        // The cheapest_old_vertex_res is one of the vertices from the already constructed tree that the new vertex
+        // is being attached to
+        // The cheapest_new_vertex_clique is the new vertex that is being added to the tree. The NodeIndex corresponds
+        // to the vertex in the clique graph and not the result graph and thus still needs to be translated.
+        let (cheapest_old_vertex_res, cheapest_new_vertex_clique) = find_cheapest_vertex(
             &clique_graph,
             &result_graph,
             edge_weight_heuristic,
             &currently_interesting_vertices,
         );
-        clique_graph_remaining_vertices.remove(&cheapest_vertex_clique);
+        clique_graph_remaining_vertices.remove(&cheapest_new_vertex_clique);
 
         // Update result graph
-        let new_vertex_res = result_graph.add_node(
+        let cheapest_new_vertex_res = result_graph.add_node(
             clique_graph
-                .node_weight(cheapest_vertex_clique)
+                .node_weight(cheapest_new_vertex_clique)
                 .expect("Vertices in clique graph should have bags as weights")
                 .clone(),
         );
 
-        node_index_map.insert(cheapest_vertex_clique, new_vertex_res);
+        node_index_map.insert(cheapest_new_vertex_clique, cheapest_new_vertex_res);
         result_graph.add_edge(
-            cheapest_vertex_res,
-            new_vertex_res,
+            cheapest_old_vertex_res,
+            cheapest_new_vertex_res,
             edge_weight_heuristic(
                 result_graph
-                    .node_weight(cheapest_vertex_res)
+                    .node_weight(cheapest_old_vertex_res)
                     .expect("Vertices should have bags as weight"),
                 result_graph
-                    .node_weight(new_vertex_res)
+                    .node_weight(cheapest_new_vertex_res)
                     .expect("Vertices should have bags as weight"),
             ),
         );
 
         // Update currently interesting vertices
-        for neighbor in clique_graph.neighbors(cheapest_vertex_clique) {
+        for neighbor in clique_graph.neighbors(cheapest_new_vertex_clique) {
             if clique_graph_remaining_vertices.contains(&neighbor) {
-                currently_interesting_vertices.insert((new_vertex_res, neighbor));
+                currently_interesting_vertices.insert((cheapest_new_vertex_res, neighbor));
             }
         }
 
         currently_interesting_vertices
-            .retain(|(_, vertex_clique)| !vertex_clique.eq(&cheapest_vertex_clique));
+            .retain(|(_, vertex_clique)| !vertex_clique.eq(&cheapest_new_vertex_clique));
 
-        // Fill bags from result graph
-        for vertex_from_starting_graph in result_graph
-            .node_weight(new_vertex_res)
-            .expect("Vertex should have weight since it was just added")
-            .clone()
-            .difference(
-                &result_graph
-                    .node_weight(cheapest_vertex_res)
-                    .expect("Vertex should have bag as weight")
-                    .clone(),
-            )
-        {
-            if let Some(vertices_in_clique_graph) =
-                clique_graph_map.get(&vertex_from_starting_graph)
-            {
-                for vertex_in_clique_graph in vertices_in_clique_graph {
-                    if let Some(vertex_res_graph) = node_index_map.get(vertex_in_clique_graph) {
-                        if vertex_res_graph != &new_vertex_res {
-                            fill_bags(
-                                new_vertex_res,
-                                *vertex_res_graph,
-                                &mut result_graph,
-                                *vertex_from_starting_graph,
-                            );
-                        }
+        fill_bags_from_result_graph(
+            &mut result_graph,
+            cheapest_new_vertex_res,
+            cheapest_old_vertex_res,
+            &clique_graph_map,
+            &node_index_map,
+        );
+    }
+
+    result_graph
+}
+
+fn fill_bags_from_result_graph<S: BuildHasher + Clone, O>(
+    result_graph: &mut Graph<HashSet<NodeIndex, S>, O, Undirected>,
+    new_vertex_res: NodeIndex,
+    cheapest_old_vertex_res: NodeIndex,
+    clique_graph_map: &HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
+    node_index_map: &HashMap<NodeIndex, NodeIndex, S>,
+) {
+    for vertex_from_starting_graph in result_graph
+        .node_weight(new_vertex_res)
+        .expect("Vertex should have weight since it was just added")
+        .clone()
+        .difference(
+            &result_graph
+                .node_weight(cheapest_old_vertex_res)
+                .expect("Vertex should have bag as weight")
+                .clone(),
+        )
+    {
+        if let Some(vertices_in_clique_graph) = clique_graph_map.get(&vertex_from_starting_graph) {
+            for vertex_in_clique_graph in vertices_in_clique_graph {
+                if let Some(vertex_res_graph) = node_index_map.get(vertex_in_clique_graph) {
+                    if vertex_res_graph != &new_vertex_res {
+                        fill_bags(
+                            new_vertex_res,
+                            *vertex_res_graph,
+                            result_graph,
+                            *vertex_from_starting_graph,
+                        );
                     }
                 }
             }
         }
     }
-
-    result_graph
 }
 
 /// Finds a path in the given graph between start_vertex and end_vertex
@@ -281,4 +298,144 @@ pub fn fill_bags_while_generating_mst_using_tree<N, E, O: Ord, S: Default + Buil
     }
 
     result_graph
+}
+
+pub fn fill_bags_while_generating_mst_least_bag_size<
+    N,
+    E,
+    O: Ord + Default + Clone,
+    S: Default + BuildHasher + Clone,
+>(
+    clique_graph: &Graph<HashSet<NodeIndex, S>, O, Undirected>,
+    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
+    clique_graph_map: HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
+) -> Graph<HashSet<NodeIndex, S>, O, Undirected> {
+    let mut result_graph: Graph<HashSet<NodeIndex, S>, O, Undirected> = Graph::new_undirected();
+    // Maps the vertex indices from the clique graph to the corresponding vertex indices in the result graph
+    let mut node_index_map: HashMap<NodeIndex, NodeIndex, S> = Default::default();
+    let mut vertex_iter = clique_graph.node_indices();
+
+    let first_vertex_clique = vertex_iter.next().expect("Graph shouldn't be empty");
+
+    // Keeps track of the remaining vertices from the clique graph that still need to be added to
+    // the result_graph
+    let mut clique_graph_remaining_vertices: HashSet<NodeIndex, S> = vertex_iter.collect();
+
+    // Keeps track of the vertices that could be added to the current sub-tree-graph
+    // First Tuple entry is node_index from the result graph that has an outgoing edge
+    // Second tuple entry is node_index from the clique graph that is the interesting vertex
+    let mut currently_interesting_vertices: HashSet<(NodeIndex, NodeIndex), S> = Default::default();
+
+    let first_vertex_res = result_graph.add_node(
+        clique_graph
+            .node_weight(first_vertex_clique)
+            .expect("Vertices in clique graph should have bags as weights")
+            .clone(),
+    );
+
+    // Add vertices that are reachable from first vertex
+    for neighbor in clique_graph.neighbors(first_vertex_clique) {
+        currently_interesting_vertices.insert((first_vertex_res, neighbor));
+    }
+    node_index_map.insert(first_vertex_clique, first_vertex_res);
+
+    while !clique_graph_remaining_vertices.is_empty() {
+        println!("{:?} number of vertices left to finish this graph", clique_graph_remaining_vertices.len());
+        let (cheapest_old_vertex_res, cheapest_vertex_clique) = find_vertex_that_minimizes_bag_size(
+            &clique_graph,
+            &result_graph,
+            &currently_interesting_vertices,
+            &clique_graph_map,
+            &node_index_map,
+        );
+        clique_graph_remaining_vertices.remove(&cheapest_vertex_clique);
+
+        // Update result graph
+        let cheapest_new_vertex_res = result_graph.add_node(
+            clique_graph
+                .node_weight(cheapest_vertex_clique)
+                .expect("Vertices in clique graph should have bags as weights")
+                .clone(),
+        );
+
+        node_index_map.insert(cheapest_vertex_clique, cheapest_new_vertex_res);
+        result_graph.add_edge(
+            cheapest_old_vertex_res,
+            cheapest_new_vertex_res,
+            edge_weight_heuristic(
+                result_graph
+                    .node_weight(cheapest_old_vertex_res)
+                    .expect("Vertices should have bags as weight"),
+                result_graph
+                    .node_weight(cheapest_new_vertex_res)
+                    .expect("Vertices should have bags as weight"),
+            ),
+        );
+
+        // Update currently interesting vertices
+        for neighbor in clique_graph.neighbors(cheapest_vertex_clique) {
+            if clique_graph_remaining_vertices.contains(&neighbor) {
+                currently_interesting_vertices.insert((cheapest_new_vertex_res, neighbor));
+            }
+        }
+
+        currently_interesting_vertices
+            .retain(|(_, vertex_clique)| !vertex_clique.eq(&cheapest_vertex_clique));
+
+            fill_bags_from_result_graph(
+                &mut result_graph,
+                cheapest_new_vertex_res,
+                cheapest_old_vertex_res,
+                &clique_graph_map,
+                &node_index_map,
+            );
+    }
+
+    result_graph
+}
+
+/// Finds the cheapest edge to a vertex not yet in the result graph trying find the vertex that minimizes 
+/// the size of the biggest bag in the result graph if the vertex is added.
+///
+/// Returns a tuple with a node index from the result graph in the first and node index from the clique graph
+/// in the second entry. The cheapest edge being the edge between these two nodes only they are different
+/// in different representations (result and clique graph respectively)
+fn find_vertex_that_minimizes_bag_size<O: Ord + Default + Clone, S: BuildHasher + Clone>(
+    clique_graph: &Graph<HashSet<NodeIndex, S>, O, Undirected>,
+    result_graph: &Graph<HashSet<NodeIndex, S>, O, Undirected>,
+    currently_interesting_vertices: &HashSet<(NodeIndex, NodeIndex), S>,
+    clique_graph_map: &HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
+    node_index_map: &HashMap<NodeIndex, NodeIndex, S>,
+) -> (NodeIndex, NodeIndex) {
+    *currently_interesting_vertices
+        .iter()
+        .min_by_key(|(vertex_res_graph, interesting_vertex_clique_graph)| {
+            // Clone result graph
+            let mut result_graph: Graph<HashSet<NodeIndex, S>, O, Undirected> = result_graph.clone();
+
+            // Update result graph
+            let cheapest_new_vertex_res = result_graph.add_node(
+                clique_graph
+                    .node_weight(*interesting_vertex_clique_graph)
+                    .expect("Vertices in clique graph should have bags as weights")
+                    .clone(),
+            );
+
+            result_graph.add_edge(
+                *vertex_res_graph,
+                cheapest_new_vertex_res,
+                O::default(),
+            );
+
+            fill_bags_from_result_graph(
+                &mut result_graph, 
+                cheapest_new_vertex_res, 
+                *vertex_res_graph, 
+                clique_graph_map, 
+                node_index_map
+            );
+
+            // Find treewidth (biggest bag size) of 
+            crate::find_width_of_tree_decomposition(&result_graph)
+        }).expect("There should be interesting vertices since there are vertices left and the graph is connected")
 }

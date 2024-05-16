@@ -14,6 +14,7 @@ pub enum TreewidthComputationMethod {
     MSTAndUseTreeStructure,
     FillWhilstMST,
     FillWhilstMSTTree,
+    FillWhilstMSTBagSize,
 }
 
 /// Computes an upper bound for the treewidth using the clique graph operator.
@@ -156,6 +157,22 @@ pub fn compute_treewidth_upper_bound<
                 O,
                 petgraph::prelude::Undirected,
             > = fill_bags_while_generating_mst_using_tree::<N, E, O, S>(
+                &clique_graph,
+                edge_weight_heuristic,
+                clique_graph_map,
+            );
+
+            (clique_graph_tree, None, None, None, clique_graph)
+        }
+        TreewidthComputationMethod::FillWhilstMSTBagSize => {
+            let (clique_graph, clique_graph_map) =
+                construct_clique_graph_with_bags(cliques, edge_weight_heuristic);
+
+            let clique_graph_tree: Graph<
+                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                O,
+                petgraph::prelude::Undirected,
+            > = fill_bags_while_generating_mst_least_bag_size::<N, E, O, S>(
                 &clique_graph,
                 edge_weight_heuristic,
                 clique_graph_map,

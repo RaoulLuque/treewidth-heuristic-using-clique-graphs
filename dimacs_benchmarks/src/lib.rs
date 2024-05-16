@@ -16,6 +16,7 @@ pub enum HeuristicTypes {
     FillWhileTreeNiTLd,
     MstTreeLdTNi,
     FillWhileLdTNi,
+    FillWhileLdTNiBag,
     // BC = Bounded cliques
     MstTreeNiTLdBC(usize),
     FillWhileTreeNiTLdBC(usize),
@@ -33,6 +34,7 @@ impl std::fmt::Display for HeuristicTypes {
             MstTreeLdTNi => "MTrLdTNi".to_string(),
             FillWhileLdTNi => "FiWhLdTNi".to_string(),
             FillWhileTreeNiTLd => "FWTNiTLd".to_string(),
+            FillWhileLdTNiBag => "FWNITLDB".to_string(),
             MstTreeNiTLdBC(clique_bound) => format!("MTrNiTLdBC {}", clique_bound),
             FillWhileTreeNiTLdBC(clique_bound) => format!("FWTNiTLd {}", clique_bound),
         };
@@ -50,12 +52,7 @@ use std::{collections::HashSet, hash::BuildHasher};
 use petgraph::graph::NodeIndex;
 use HeuristicTypes::*;
 
-pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 4] = [
-    MstTreeNi,
-    MstTreeNiTLd,
-    FillWhileNiTLd,
-    FillWhileTreeNiTLd,
-];
+pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 2] = [FillWhileNiTLd, FillWhileLdTNiBag];
 
 pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
     heuristic: &HeuristicTypes,
@@ -82,6 +79,9 @@ pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
         FillWhileTreeNiTLd => {
             EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
         }
+        FillWhileLdTNiBag => {
+            EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
+        }
         MstTreeNiTLdBC(_) => {
             EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
         }
@@ -104,6 +104,7 @@ pub fn heuristic_to_computation_type(
         MstTreeNiTLd => MSTAndUseTreeStructure,
         FillWhileNiTLd => FillWhilstMST,
         FillWhileTreeNiTLd => FillWhilstMSTTree,
+        FillWhileLdTNiBag => FillWhilstMSTBagSize,
         MstTreeNiTLdBC(_) => MSTAndUseTreeStructure,
         FillWhileTreeNiTLdBC(_) => FillWhilstMSTTree,
     }
@@ -120,6 +121,7 @@ pub fn heuristic_to_clique_bound(heuristic: &HeuristicTypes) -> Option<usize> {
         MstTreeNiTLd => None,
         FillWhileNiTLd => None,
         FillWhileTreeNiTLd => None,
+        FillWhileLdTNiBag => None,
         MstTreeNiTLdBC(clique_bound) => Some(*clique_bound),
         FillWhileTreeNiTLdBC(clique_bound) => Some(*clique_bound),
     }
