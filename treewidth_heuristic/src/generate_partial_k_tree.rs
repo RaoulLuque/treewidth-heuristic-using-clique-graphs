@@ -3,7 +3,7 @@ use petgraph::{graph::NodeIndex, visit::IntoNodeIdentifiers, Graph, Undirected};
 use rand::prelude::SliceRandom;
 use rand::{seq::IteratorRandom, Rng};
 
-use crate::maximum_minimum_degree;
+use crate::maximum_minimum_degree_plus;
 
 /// Generates a [k-tree](https://en.wikipedia.org/wiki/K-tree) and then randomly removes p percent of the edges
 /// to get a [partial k-tree](https://en.wikipedia.org/wiki/Partial_k-tree). To guarantee a treewidth of k,
@@ -24,7 +24,7 @@ pub fn generate_partial_k_tree_with_guaranteed_treewidth(
 ) -> Option<Graph<i32, i32, Undirected>> {
     loop {
         if let Some(graph) = generate_partial_k_tree(k, n, p, rng) {
-            if maximum_minimum_degree(&graph) == k {
+            if maximum_minimum_degree_plus(&graph) == k {
                 return Some(graph);
             } else {
                 info!("Random partial-k-tree graph was just discarded");
@@ -129,8 +129,9 @@ mod tests {
         let complete_graph_twenty_vertices = generate_complete_graph(20);
 
         let max_min_degree_hundred =
-            crate::maximum_minimum_degree(&complete_graph_hundred_vertices);
-        let max_min_degree_twenty = crate::maximum_minimum_degree(&complete_graph_twenty_vertices);
+            crate::maximum_minimum_degree_plus(&complete_graph_hundred_vertices);
+        let max_min_degree_twenty =
+            crate::maximum_minimum_degree_plus(&complete_graph_twenty_vertices);
 
         assert_eq!(max_min_degree_hundred, 99);
         assert_eq!(max_min_degree_twenty, 19);
@@ -141,8 +142,8 @@ mod tests {
         let hundred_tree = generate_k_tree(100, 150).expect("k is smaller than n");
         let twenty_five_tree = generate_k_tree(25, 100).expect("k is smaller than n");
 
-        let max_min_degree_hundred = crate::maximum_minimum_degree(&hundred_tree);
-        let max_min_degree_twenty_give = crate::maximum_minimum_degree(&twenty_five_tree);
+        let max_min_degree_hundred = crate::maximum_minimum_degree_plus(&hundred_tree);
+        let max_min_degree_twenty_give = crate::maximum_minimum_degree_plus(&twenty_five_tree);
 
         assert_eq!(max_min_degree_hundred, 100);
         assert_eq!(max_min_degree_twenty_give, 25);
@@ -151,18 +152,25 @@ mod tests {
     #[test]
     fn test_generate_partial_k_tree_with_guarantee_with_maximum_minimum_degree() {
         let mut rng = rand::thread_rng();
-        let hundred_tree =
-            generate_partial_k_tree_with_guaranteed_treewidth(10, 1000, 40, &mut rng)
-                .expect("k is smaller than n");
-        let twenty_five_tree =
-            generate_partial_k_tree_with_guaranteed_treewidth(10, 500, 20, &mut rng)
+
+        for (k, n, p) in vec![
+            (10, 200, 20),
+            (10, 500, 20),
+            (10, 1000, 20),
+            (10, 200, 30),
+            (10, 500, 30),
+            (10, 1000, 30),
+            (10, 200, 40),
+            (10, 500, 40),
+            (10, 1000, 40),
+        ] {
+            let tree = generate_partial_k_tree_with_guaranteed_treewidth(k, n, p, &mut rng)
                 .expect("k is smaller than n");
 
-        let max_min_degree_hundred = crate::maximum_minimum_degree(&hundred_tree);
-        let max_min_degree_twenty_give = crate::maximum_minimum_degree(&twenty_five_tree);
+            let guaranteed_lower_bound = crate::maximum_minimum_degree_plus(&tree);
 
-        assert_eq!(max_min_degree_hundred, 10);
-        assert_eq!(max_min_degree_twenty_give, 10);
+            assert_eq!(guaranteed_lower_bound, k);
+        }
     }
 
     #[test]
@@ -174,8 +182,8 @@ mod tests {
             generate_partial_k_tree_with_guaranteed_treewidth(30, 100, 10, &mut rng)
                 .expect("k is smaller than n");
 
-        let max_min_degree_hundred = crate::maximum_minimum_degree(&hundred_tree);
-        let max_min_degree_twenty_give = crate::maximum_minimum_degree(&twenty_five_tree);
+        let max_min_degree_hundred = crate::maximum_minimum_degree_plus(&hundred_tree);
+        let max_min_degree_twenty_give = crate::maximum_minimum_degree_plus(&twenty_five_tree);
 
         assert_eq!(max_min_degree_hundred, 20);
         assert_eq!(max_min_degree_twenty_give, 30);

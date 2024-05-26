@@ -32,7 +32,7 @@ pub(crate) use find_width_of_tree_decomposition::find_width_of_tree_decompositio
 pub use generate_partial_k_tree::{
     generate_partial_k_tree, generate_partial_k_tree_with_guaranteed_treewidth,
 };
-pub(crate) use maximum_minimum_degree_heuristic::maximum_minimum_degree;
+pub(crate) use maximum_minimum_degree_heuristic::maximum_minimum_degree_plus;
 
 // Debug version
 #[cfg(debug_assertions)]
