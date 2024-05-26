@@ -27,9 +27,8 @@ pub fn maximum_minimum_degree_plus<N: Clone + Default, E: Clone + Default>(
             .neighbors(min_degree_vertex)
             .collect::<HashSet<_>>();
 
-        let least_common_neighbours_neighbour = min_degree_vertex_neighbours
-            .iter()
-            .min_by_key(|id| {
+        if let Some(least_common_neighbours_neighbour) =
+            min_degree_vertex_neighbours.iter().min_by_key(|id| {
                 if id == &&min_degree_vertex {
                     graph_copy.node_count() + 1
                 } else {
@@ -41,13 +40,15 @@ pub fn maximum_minimum_degree_plus<N: Clone + Default, E: Clone + Default>(
                         .len()
                 }
             })
-            .expect("Graph should have at least 2 nodes");
-
-        contract_edge(
-            &mut graph_copy,
-            min_degree_vertex,
-            *least_common_neighbours_neighbour,
-        );
+        {
+            contract_edge(
+                &mut graph_copy,
+                min_degree_vertex,
+                *least_common_neighbours_neighbour,
+            );
+        } else {
+            break;
+        }
     }
 
     max_min
