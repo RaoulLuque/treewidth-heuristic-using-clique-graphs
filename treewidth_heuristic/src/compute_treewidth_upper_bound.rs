@@ -5,7 +5,6 @@ use std::{
 };
 
 use crate::*;
-use itertools::Itertools;
 use petgraph::{graph::NodeIndex, Graph, Undirected};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]

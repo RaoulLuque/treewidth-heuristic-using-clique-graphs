@@ -1,11 +1,7 @@
-use std::{collections::HashSet, hash::Hash};
+use std::collections::HashSet;
 
-use itertools::{min, Itertools};
-use petgraph::{
-    graph::NodeIndex,
-    visit::{GetAdjacencyMatrix, IntoNeighbors, IntoNodeIdentifiers},
-    Graph, Undirected,
-};
+use itertools::Itertools;
+use petgraph::{graph::NodeIndex, visit::IntoNodeIdentifiers, Graph, Undirected};
 
 /// Computes the contraction degeneracy of the given graph according to https://link.springer.com/chapter/10.1007/978-3-540-30140-0_56 (see MMD+: least-c)
 pub fn maximum_minimum_degree_plus<N: Clone + Default, E: Clone + Default>(
