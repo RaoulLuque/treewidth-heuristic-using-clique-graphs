@@ -3,6 +3,7 @@ use std::{
     hash::BuildHasher,
 };
 
+use itertools::Itertools;
 use petgraph::{graph::NodeIndex, Graph, Undirected};
 
 pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + Clone>(
@@ -39,7 +40,17 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
     }
     node_index_map.insert(first_vertex_clique, first_vertex_res);
 
+    let mut current_treewidth = 0;
+
     while !clique_graph_remaining_vertices.is_empty() {
+        println!(
+            "{} vertices remaining",
+            clique_graph_remaining_vertices.len()
+        );
+        if current_treewidth != crate::find_width_of_tree_decomposition(&result_graph) {
+            current_treewidth = crate::find_width_of_tree_decomposition(&result_graph);
+            println!("Max bagsize increased to: {}", current_treewidth + 1);
+        }
         // The cheapest_old_vertex_res is one of the vertices from the already constructed tree that the new vertex
         // is being attached to
         // The cheapest_new_vertex_clique is the new vertex that is being added to the tree. The NodeIndex corresponds
@@ -58,6 +69,24 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
                 .node_weight(cheapest_new_vertex_clique)
                 .expect("Vertices in clique graph should have bags as weights")
                 .clone(),
+        );
+
+        println!(
+            "Number of vertices not in intersection with new vertex is: {} of total {}",
+            result_graph
+                .node_weight(cheapest_new_vertex_res)
+                .unwrap()
+                .len()
+                - result_graph
+                    .node_weight(cheapest_old_vertex_res)
+                    .unwrap()
+                    .intersection(result_graph.node_weight(cheapest_new_vertex_res).unwrap())
+                    .collect_vec()
+                    .len(),
+            result_graph
+                .node_weight(cheapest_new_vertex_res)
+                .unwrap()
+                .len()
         );
 
         node_index_map.insert(cheapest_new_vertex_clique, cheapest_new_vertex_res);
