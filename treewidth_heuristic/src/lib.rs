@@ -24,7 +24,7 @@ pub(crate) use fill_bags_along_paths::{
 };
 pub(crate) use fill_bags_while_generating_mst::{
     fill_bags_while_generating_mst, fill_bags_while_generating_mst_least_bag_size,
-    fill_bags_while_generating_mst_using_tree,
+    fill_bags_while_generating_mst_update_edges, fill_bags_while_generating_mst_using_tree,
 };
 pub(crate) use find_connected_components::find_connected_components;
 pub(crate) use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};

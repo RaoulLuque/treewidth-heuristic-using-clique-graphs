@@ -108,7 +108,6 @@ pub fn fill_bags_along_paths_using_structure<E: Default + Debug, S: Default + Bu
     );
 
     for vertex_in_initial_graph in clique_graph_map.keys() {
-        info!("Filling up bags");
         fill_bags_until_common_predecessor(
             graph,
             &tree_predecessor_map,

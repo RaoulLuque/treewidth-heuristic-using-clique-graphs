@@ -6,20 +6,25 @@ pub enum HeuristicTypes {
     // FillWhile = Fill while building minimum spanning tree
     // Ni = Negative Intersection
     MstTreeNi,
+
     FillWhileNi,
     // Ld = Least difference
     MstTreeLd,
+
     FillWhileLd,
     // T = Then
     MstTreeNiTLd,
     FillWhileNiTLd,
+    FillWhileUpNiTLd,
     FillWhileTreeNiTLd,
+
     MstTreeLdTNi,
     FillWhileLdTNi,
     // Bag = See [TreewidthComputationMethod::FillWhilstMSTBagSize]
     FillWhileBag,
     // BC = Bounded cliques
     MstTreeNiTLdBC(usize),
+    FillWhileNiTLdBC(usize),
     FillWhileTreeNiTLdBC(usize),
 }
 
@@ -32,11 +37,13 @@ impl std::fmt::Display for HeuristicTypes {
             FillWhileLd => "FiWhLd".to_string(),
             MstTreeNiTLd => "MTrNiTLd".to_string(),
             FillWhileNiTLd => "FiWhNiTLd".to_string(),
+            FillWhileUpNiTLd => "FWUNiTLd".to_string(),
             MstTreeLdTNi => "MTrLdTNi".to_string(),
             FillWhileLdTNi => "FiWhLdTNi".to_string(),
             FillWhileTreeNiTLd => "FWTNiTLd".to_string(),
             FillWhileBag => "FWB".to_string(),
             MstTreeNiTLdBC(clique_bound) => format!("MTrNiTLdBC {}", clique_bound),
+            FillWhileNiTLdBC(clique_bound) => format!("FiWhLdTNiBC {}", clique_bound),
             FillWhileTreeNiTLdBC(clique_bound) => format!("FWTNiTLd {}", clique_bound),
         };
         write!(f, "{}", display_string)
@@ -53,7 +60,7 @@ use std::{collections::HashSet, hash::BuildHasher};
 use petgraph::graph::NodeIndex;
 use HeuristicTypes::*;
 
-pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 1] = [FillWhileNiTLd];
+pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 2] = [MstTreeNiTLd, MstTreeNiTLdBC(2)];
 
 pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
     heuristic: &HeuristicTypes,
@@ -77,6 +84,9 @@ pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
         FillWhileNiTLd => {
             EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
         }
+        FillWhileUpNiTLd => {
+            EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
+        }
         FillWhileTreeNiTLd => {
             EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
         }
@@ -84,6 +94,9 @@ pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
             EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
         }
         MstTreeNiTLdBC(_) => {
+            EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
+        }
+        FillWhileNiTLdBC(_) => {
             EdgeWeightTypes::ReturnI32Tuple(negative_intersection_then_least_difference_heuristic)
         }
         FillWhileTreeNiTLdBC(_) => {
@@ -104,9 +117,11 @@ pub fn heuristic_to_computation_type(
         FillWhileLdTNi => FillWhilstMST,
         MstTreeNiTLd => MSTAndUseTreeStructure,
         FillWhileNiTLd => FillWhilstMST,
+        FillWhileUpNiTLd => FillWhilstMSTEdgeUpdate,
         FillWhileTreeNiTLd => FillWhilstMSTTree,
         FillWhileBag => FillWhilstMSTBagSize,
         MstTreeNiTLdBC(_) => MSTAndUseTreeStructure,
+        FillWhileNiTLdBC(_) => FillWhilstMST,
         FillWhileTreeNiTLdBC(_) => FillWhilstMSTTree,
     }
 }
@@ -121,9 +136,11 @@ pub fn heuristic_to_clique_bound(heuristic: &HeuristicTypes) -> Option<usize> {
         FillWhileLdTNi => None,
         MstTreeNiTLd => None,
         FillWhileNiTLd => None,
+        FillWhileUpNiTLd => None,
         FillWhileTreeNiTLd => None,
         FillWhileBag => None,
         MstTreeNiTLdBC(clique_bound) => Some(*clique_bound),
+        FillWhileNiTLdBC(clique_bound) => Some(*clique_bound),
         FillWhileTreeNiTLdBC(clique_bound) => Some(*clique_bound),
     }
 }

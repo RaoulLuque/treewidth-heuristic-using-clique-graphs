@@ -35,7 +35,6 @@ pub fn check_tree_decomposition<N, E, O, S: BuildHasher + Default>(
             return false;
         }
     }
-
     // Check if (2) from tree decomposition is satisfied (for all edges in starting graph there is bag containing
     // both its vertices)
     for edge_reference in starting_graph.edge_references() {
@@ -56,7 +55,6 @@ pub fn check_tree_decomposition<N, E, O, S: BuildHasher + Default>(
             return false;
         }
     }
-
     // check if (3) from tree decomposition definition is satisfied (for one vertex in starting graph, all bags
     // contain this vertex induce a subtree)
     for mut vec in tree_decomposition_graph.node_references().combinations(2) {

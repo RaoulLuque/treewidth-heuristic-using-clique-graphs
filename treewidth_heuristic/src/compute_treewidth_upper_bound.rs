@@ -11,8 +11,11 @@ use petgraph::{graph::NodeIndex, Graph, Undirected};
 pub enum TreewidthComputationMethod {
     MSTAndFill,
     MSTAndUseTreeStructure,
+    // Fill bags while constructing a spanning tree minimizing according to the edge heuristic
     FillWhilstMST,
-    // Fills bags while constructing a spanning tree of the clique graph trying to minimize the maximum bag size in each step
+    // Fill bags while constructing a spanning tree minimizing according to the edge heuristic. Updating adjacencies in clique graph according to bag updates
+    FillWhilstMSTEdgeUpdate,
+    // Fill bags while constructing a spanning tree minimizing according to the edge heuristic trying to speed up by using the tree structure
     FillWhilstMSTTree,
     // Fills bags while constructing a spanning tree of the clique graph trying to minimize the maximum bag size in each step
     FillWhilstMSTBagSize,
@@ -56,6 +59,9 @@ pub fn compute_treewidth_upper_bound<
             // .sorted()
             .collect()
     };
+    if cliques.len() > 3 {
+        println!("Number of cliques: {}", cliques.len());
+    }
 
     let (
         clique_graph_tree_after_filling_up,
@@ -119,11 +125,6 @@ pub fn compute_treewidth_upper_bound<
 
             let predecessor_map =
                 fill_bags_along_paths_using_structure(&mut clique_graph_tree, &clique_graph_map);
-            // DEBUG
-            // println!(
-            //     "Clique graph tree after filling up: {:?} \n \n",
-            //     clique_graph_tree
-            // );
 
             (
                 clique_graph_tree,
@@ -142,6 +143,22 @@ pub fn compute_treewidth_upper_bound<
                 O,
                 petgraph::prelude::Undirected,
             > = fill_bags_while_generating_mst::<N, E, O, S>(
+                &clique_graph,
+                edge_weight_heuristic,
+                clique_graph_map,
+            );
+
+            (clique_graph_tree, None, None, None, clique_graph)
+        }
+        TreewidthComputationMethod::FillWhilstMSTEdgeUpdate => {
+            let (clique_graph, clique_graph_map) =
+                construct_clique_graph_with_bags(cliques, edge_weight_heuristic);
+
+            let clique_graph_tree: Graph<
+                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                O,
+                petgraph::prelude::Undirected,
+            > = fill_bags_while_generating_mst_update_edges::<N, E, O, S>(
                 &clique_graph,
                 edge_weight_heuristic,
                 clique_graph_map,

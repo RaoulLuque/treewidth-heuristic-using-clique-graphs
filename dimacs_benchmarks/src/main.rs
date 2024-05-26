@@ -18,7 +18,7 @@ type Hasher = std::hash::RandomState;
 fn main() {
     env_logger::init();
 
-    let number_of_repetitions_per_heuristic = 1;
+    let number_of_repetitions_per_heuristic = 5;
 
     let mut benchmark_log_file =
         File::create("dimacs_benchmarks/benchmark_results/dimacs_results.txt")
@@ -81,7 +81,7 @@ fn main() {
                             &graph,
                             edge_weight_heuristic,
                             computation_type,
-                            true,
+                            false,
                             clique_bound,
                         )
                     }
@@ -90,7 +90,7 @@ fn main() {
                             &graph,
                             edge_weight_heuristic,
                             computation_type,
-                            true,
+                            false,
                             clique_bound,
                         )
                     }
