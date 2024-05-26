@@ -140,9 +140,6 @@ where
             if clique.len() <= k {
                 return Some(clique.into_iter().collect::<TargetColl>());
             } else {
-                if k != 2 {
-                    println!("Clique with size: {} bigger than {} found", clique.len(), k);
-                }
                 combinations = clique.into_iter().combinations(k);
             }
         } else {
