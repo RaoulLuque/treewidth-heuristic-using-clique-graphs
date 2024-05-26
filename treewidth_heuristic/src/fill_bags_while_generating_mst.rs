@@ -340,7 +340,10 @@ pub fn fill_bags_while_generating_mst_least_bag_size<
     node_index_map.insert(first_vertex_clique, first_vertex_res);
 
     while !clique_graph_remaining_vertices.is_empty() {
-        println!("{:?} number of vertices left to finish this graph", clique_graph_remaining_vertices.len());
+        println!(
+            "{:?} number of vertices left to finish this graph",
+            clique_graph_remaining_vertices.len()
+        );
         let (cheapest_old_vertex_res, cheapest_vertex_clique) = find_vertex_that_minimizes_bag_size(
             &clique_graph,
             &result_graph,
@@ -382,19 +385,19 @@ pub fn fill_bags_while_generating_mst_least_bag_size<
         currently_interesting_vertices
             .retain(|(_, vertex_clique)| !vertex_clique.eq(&cheapest_vertex_clique));
 
-            fill_bags_from_result_graph(
-                &mut result_graph,
-                cheapest_new_vertex_res,
-                cheapest_old_vertex_res,
-                &clique_graph_map,
-                &node_index_map,
-            );
+        fill_bags_from_result_graph(
+            &mut result_graph,
+            cheapest_new_vertex_res,
+            cheapest_old_vertex_res,
+            &clique_graph_map,
+            &node_index_map,
+        );
     }
 
     result_graph
 }
 
-/// Finds the cheapest edge to a vertex not yet in the result graph trying find the vertex that minimizes 
+/// Finds the cheapest edge to a vertex not yet in the result graph trying find the vertex that minimizes
 /// the size of the biggest bag in the result graph if the vertex is added.
 ///
 /// Returns a tuple with a node index from the result graph in the first and node index from the clique graph
@@ -428,10 +431,10 @@ fn find_vertex_that_minimizes_bag_size<O: Ord + Default + Clone, S: BuildHasher 
             );
 
             fill_bags_from_result_graph(
-                &mut result_graph, 
-                cheapest_new_vertex_res, 
-                *vertex_res_graph, 
-                clique_graph_map, 
+                &mut result_graph,
+                cheapest_new_vertex_res,
+                *vertex_res_graph,
+                clique_graph_map,
                 node_index_map
             );
 
