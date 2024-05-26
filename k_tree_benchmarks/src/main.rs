@@ -161,7 +161,7 @@ fn main() {
         for i in 0..HEURISTICS_BEING_TESTED.len() {
             let current_value_tuple = calculation_vec.get(i).expect("Calculation should exist");
             log.push_str(&format!(
-                "{: <4} {: <7}|",
+                " {: <7} {: <7} |",
                 format!("{:.1}", current_value_tuple.0),
                 format!("{:.1}", current_value_tuple.1)
             ));
