@@ -12,7 +12,9 @@ pub enum TreewidthComputationMethod {
     MSTAndFill,
     MSTAndUseTreeStructure,
     FillWhilstMST,
+    // Fills bags while constructing a spanning tree of the clique graph trying to minimize the maximum bag size in each step
     FillWhilstMSTTree,
+    // Fills bags while constructing a spanning tree of the clique graph trying to minimize the maximum bag size in each step
     FillWhilstMSTBagSize,
 }
 
@@ -173,7 +175,6 @@ pub fn compute_treewidth_upper_bound<
                 petgraph::prelude::Undirected,
             > = fill_bags_while_generating_mst_least_bag_size::<N, E, O, S>(
                 &clique_graph,
-                edge_weight_heuristic,
                 clique_graph_map,
             );
 

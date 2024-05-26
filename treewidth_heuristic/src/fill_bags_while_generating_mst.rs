@@ -307,7 +307,6 @@ pub fn fill_bags_while_generating_mst_least_bag_size<
     S: Default + BuildHasher + Clone,
 >(
     clique_graph: &Graph<HashSet<NodeIndex, S>, O, Undirected>,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
     clique_graph_map: HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
 ) -> Graph<HashSet<NodeIndex, S>, O, Undirected> {
     let mut result_graph: Graph<HashSet<NodeIndex, S>, O, Undirected> = Graph::new_undirected();
@@ -340,10 +339,6 @@ pub fn fill_bags_while_generating_mst_least_bag_size<
     node_index_map.insert(first_vertex_clique, first_vertex_res);
 
     while !clique_graph_remaining_vertices.is_empty() {
-        println!(
-            "{:?} number of vertices left to finish this graph",
-            clique_graph_remaining_vertices.len()
-        );
         let (cheapest_old_vertex_res, cheapest_vertex_clique) = find_vertex_that_minimizes_bag_size(
             &clique_graph,
             &result_graph,
@@ -365,14 +360,7 @@ pub fn fill_bags_while_generating_mst_least_bag_size<
         result_graph.add_edge(
             cheapest_old_vertex_res,
             cheapest_new_vertex_res,
-            edge_weight_heuristic(
-                result_graph
-                    .node_weight(cheapest_old_vertex_res)
-                    .expect("Vertices should have bags as weight"),
-                result_graph
-                    .node_weight(cheapest_new_vertex_res)
-                    .expect("Vertices should have bags as weight"),
-            ),
+            O::default(),
         );
 
         // Update currently interesting vertices
