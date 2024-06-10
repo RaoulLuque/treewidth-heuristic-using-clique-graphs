@@ -48,6 +48,39 @@ pub const PARTIAL_K_TREE_CONFIGURATIONS: [(usize, usize, usize); 24] = [
     (1000, 20, 50),
 ];
 
+// pub const PARTIAL_K_TREE_CONFIGURATIONS: [(usize, usize, usize); 30] = [
+//     (10, 5, 5),
+//     (10, 5, 10),
+//     (10, 5, 15),
+//     (10, 5, 20),
+//     (10, 5, 25),
+//     (10, 5, 30),
+//     (10, 5, 35),
+//     (10, 5, 40),
+//     (10, 5, 45),
+//     (10, 5, 50),
+//     (10, 5, 55),
+//     (10, 5, 60),
+//     (10, 5, 65),
+//     (10, 5, 70),
+//     (10, 5, 75),
+//     (20, 5, 5),
+//     (20, 5, 10),
+//     (20, 5, 15),
+//     (20, 5, 20),
+//     (20, 5, 25),
+//     (20, 5, 30),
+//     (20, 5, 35),
+//     (20, 5, 40),
+//     (20, 5, 45),
+//     (20, 5, 50),
+//     (20, 5, 55),
+//     (20, 5, 60),
+//     (20, 5, 65),
+//     (20, 5, 70),
+//     (20, 5, 75),
+// ];
+
 fn main() {
     // Opening log file
     let mut benchmark_log_file =
@@ -154,7 +187,7 @@ fn main() {
         log.push_str(&format!("n: {} | k: {} | p: {} \n", n, k, p));
 
         for heuristic in HEURISTICS_BEING_TESTED {
-            log.push_str(&format!("| {: <10} ", heuristic))
+            log.push_str(&format!("| {: <15} ", heuristic.to_string()))
         }
 
         log.push_str("|\n|");

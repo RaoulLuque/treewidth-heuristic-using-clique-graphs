@@ -60,7 +60,16 @@ use std::{collections::HashSet, hash::BuildHasher};
 use petgraph::graph::NodeIndex;
 use HeuristicTypes::*;
 
-pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 2] = [MstTreeNiTLd, MstTreeNiTLdBC(2)];
+pub const HEURISTICS_BEING_TESTED: [HeuristicTypes; 8] = [
+    MstTreeNiTLd,
+    MstTreeNiTLdBC(2),
+    MstTreeNiTLdBC(3),
+    MstTreeNiTLdBC(10),
+    FillWhileNiTLd,
+    FillWhileNiTLdBC(2),
+    FillWhileNiTLdBC(3),
+    FillWhileNiTLdBC(10),
+];
 
 pub fn heuristic_to_edge_weight_heuristic<S: BuildHasher + Default>(
     heuristic: &HeuristicTypes,

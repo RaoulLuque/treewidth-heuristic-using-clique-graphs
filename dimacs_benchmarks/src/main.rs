@@ -46,7 +46,7 @@ fn main() {
 
     for heuristic in HEURISTICS_BEING_TESTED {
         let heuristic_string = heuristic.to_string();
-        log.push_str(&format!(" {0: <11} |", heuristic_string))
+        log.push_str(&format!(" {0: <15} |", heuristic_string))
     }
     log.push_str("\n");
 
@@ -127,7 +127,7 @@ fn main() {
         for i in 0..HEURISTICS_BEING_TESTED.len() {
             let current_value_tuple = calculation_vec.get(i).expect("Calculation should exist");
             log.push_str(&format!(
-                " {0: <4} {1: <7}|",
+                " {0: <7} {1: <7} |",
                 current_value_tuple.0, current_value_tuple.1
             ));
         }
