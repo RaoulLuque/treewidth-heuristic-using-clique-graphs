@@ -29,3 +29,6 @@ let treewidth_upper_bound = compute_treewidth_upper_bound(
     false,
 );
 ```
+
+## Benchmarks
+Benchmarks are found in [this](https://github.com/RaoulLuque/treewidth-heuristic-clique-graph-benchmarks) repository.
