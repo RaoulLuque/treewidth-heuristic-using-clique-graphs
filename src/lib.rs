@@ -1,5 +1,5 @@
 mod check_tree_decomposition;
-mod clique_graph_edge_weight_heuristics;
+mod clique_graph_edge_weight_functions;
 mod compute_treewidth_upper_bound;
 mod construct_clique_graph;
 mod fill_bags_along_paths;
@@ -13,7 +13,7 @@ mod maximum_minimum_degree_heuristic;
 
 // Imports for using the library
 pub(crate) use check_tree_decomposition::check_tree_decomposition;
-pub use clique_graph_edge_weight_heuristics::*;
+pub use clique_graph_edge_weight_functions::*;
 pub use compute_treewidth_upper_bound::{
     compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
     TreewidthComputationMethod,
@@ -321,7 +321,7 @@ pub(crate) mod tests {
         for computation_method in COMPUTATION_METHODS {
             let treewidth = compute_treewidth_upper_bound_not_connected(
                 &graph,
-                negative_intersection_heuristic::<std::hash::RandomState>,
+                negative_intersection::<std::hash::RandomState>,
                 computation_method,
                 true,
                 None,
@@ -330,7 +330,7 @@ pub(crate) mod tests {
 
             let treewidth = compute_treewidth_upper_bound_not_connected(
                 &graph,
-                least_difference_heuristic::<std::hash::RandomState>,
+                least_difference::<std::hash::RandomState>,
                 computation_method,
                 true,
                 None,

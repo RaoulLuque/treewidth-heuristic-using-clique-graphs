@@ -9,13 +9,15 @@ use petgraph::{graph::NodeIndex, Graph, Undirected};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum TreewidthComputationMethod {
+    // Constructs a minimum spanning tree of the clique graph and fills up the bags afterwards
     MSTAndFill,
+    // Constructs a minimum spanning tree of the clique graph and fills up the bags afterwards trying to speed up filling up by using the tree structure
     MSTAndUseTreeStructure,
     // Fill bags while constructing a spanning tree minimizing according to the edge heuristic
     FillWhilstMST,
     // Fill bags while constructing a spanning tree minimizing according to the edge heuristic. Updating adjacencies in clique graph according to bag updates
     FillWhilstMSTEdgeUpdate,
-    // Fill bags while constructing a spanning tree minimizing according to the edge heuristic trying to speed up by using the tree structure
+    // Fill bags while constructing a spanning tree minimizing according to the edge heuristic trying to speed up filling up by using the tree structure
     FillWhilstMSTTree,
     // Fills bags while constructing a spanning tree of the clique graph trying to minimize the maximum bag size in each step
     FillWhilstMSTBagSize,
@@ -328,7 +330,7 @@ mod tests {
                     _,
                 >(
                     &test_graph.graph,
-                    negative_intersection_heuristic,
+                    negative_intersection,
                     computation_method,
                     false,
                     None,
@@ -362,7 +364,7 @@ mod tests {
             _,
         >(
             &test_graph.graph,
-            negative_intersection_heuristic,
+            negative_intersection,
             computation_method,
             false,
             None,
@@ -386,7 +388,7 @@ mod tests {
                     _,
                 >(
                     &test_graph.graph,
-                    least_difference_heuristic,
+                    least_difference,
                     computation_method,
                     false,
                     None,
