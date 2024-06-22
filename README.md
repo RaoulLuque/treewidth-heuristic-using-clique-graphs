@@ -4,7 +4,7 @@ A library implementing a heuristic for computing an upper bound for the treewidt
 
 ## Usage
 
-This crate provides `compute_treewidth_upper_bound` and `compute_treewidth_upper_bound_not_connected` as functions.
+This crate mainly provides `compute_treewidth_upper_bound` and `compute_treewidth_upper_bound_not_connected` as functions.
 They calculate upper bounds on the treewidth of connected and not connected undirected (pet)graphs respectively.
 
 ```rust
