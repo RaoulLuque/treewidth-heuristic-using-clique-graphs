@@ -62,7 +62,8 @@ pub fn compute_treewidth_upper_bound<
             .collect()
     };
     if cliques.len() > 3 {
-        println!("Number of cliques: {}", cliques.len());
+        // DEBUG
+        // println!("Number of cliques: {}", cliques.len());
     }
 
     let (
