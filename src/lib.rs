@@ -6,7 +6,6 @@ mod fill_bags_along_paths;
 mod fill_bags_while_generating_mst;
 mod find_connected_components;
 mod find_maximum_cliques;
-mod find_path_in_tree;
 mod find_width_of_tree_decomposition;
 mod generate_partial_k_tree;
 mod maximum_minimum_degree_heuristic;
