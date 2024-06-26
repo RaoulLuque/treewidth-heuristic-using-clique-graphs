@@ -1,5 +1,5 @@
 [package]
-name = "treewidth_heuristic_using_clique_graph"
+name = "treewidth-heuristic-using-clique-graphs"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.76"
@@ -11,4 +11,4 @@ repository = "https://github.com/RaoulLuque/treewidth-heuristic-clique-graph"
 petgraph = "0.6.4"
 itertools = "0.13"
 rand = "0.8.5"
-rustc-hash = { git = "https://github.com/rust-lang/rustc-hash"}
+rustc-hash = { version ="2.0.0", git = "https://github.com/rust-lang/rustc-hash"}

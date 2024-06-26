@@ -3,7 +3,6 @@ use std::{
     hash::BuildHasher,
 };
 
-use itertools::Itertools;
 use petgraph::{graph::NodeIndex, Graph, Undirected};
 
 pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + Clone>(

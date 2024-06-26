@@ -7,6 +7,7 @@ use std::hash::{BuildHasher, Hash};
 /// Is implemented using a stack and depth first search.
 ///
 /// Returns None if no path exists (should never happen in a tree).
+
 pub fn find_path_in_tree<G, T, S: Default + BuildHasher>(
     graph: G,
     start: G::NodeId,
