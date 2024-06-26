@@ -30,7 +30,7 @@ pub(crate) use find_connected_components::find_connected_components;
 pub(crate) use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
 pub(crate) use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
 pub use generate_partial_k_tree::{
-    generate_partial_k_tree, generate_partial_k_tree_with_guaranteed_treewidth,
+    generate_k_tree, generate_partial_k_tree, generate_partial_k_tree_with_guaranteed_treewidth,
 };
 pub(crate) use maximum_minimum_degree_heuristic::maximum_minimum_degree_plus;
 
