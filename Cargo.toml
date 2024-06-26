@@ -1,16 +1,14 @@
 [package]
-name = "treewidth_heuristic_clique_graph"
+name = "treewidth_heuristic_using_clique_graph"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.76"
 authors = ["Raoul Luque <raoulsluque@gmail.com>"]
-description = "A heuristic for calculating an upper bound on the treewidth of graphs using clique-graphs"
+description = "A heuristic for calculating an upper bound on the treewidth of graphs using clique graphs"
 repository = "https://github.com/RaoulLuque/treewidth-heuristic-clique-graph"
-
 
 [dependencies]
 petgraph = "0.6.4"
 itertools = "0.13"
 rand = "0.8.5"
-log = "0.4"
 rustc-hash = { git = "https://github.com/rust-lang/rustc-hash"}

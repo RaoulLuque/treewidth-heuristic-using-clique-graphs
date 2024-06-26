@@ -1,13 +1,11 @@
-use std::{
-    collections::{HashMap, HashSet},
-    hash::BuildHasher,
-};
-
 use itertools::Itertools;
-use log::error;
 use petgraph::{
     prelude::*,
     visit::{IntoNodeReferences, NodeRef},
+};
+use std::{
+    collections::{HashMap, HashSet},
+    hash::BuildHasher,
 };
 
 /// Given a tree decomposition checks if it is a valid tree decomposition. Returns true if the decomposition
@@ -31,7 +29,7 @@ pub fn check_tree_decomposition<N, E, O, S: BuildHasher + Default>(
             .node_weights()
             .find(|s| s.contains(&vertex))
         {
-            error!("Tree decomposition doesn't contain vertex: {:?}", vertex);
+            println!("Tree decomposition doesn't contain vertex: {:?}", vertex);
             return false;
         }
     }
@@ -51,7 +49,7 @@ pub fn check_tree_decomposition<N, E, O, S: BuildHasher + Default>(
         }
 
         if !edge_is_contained {
-            error!("Tree decomposition doesn't contain edge: {:?}", edge_as_set);
+            println!("Tree decomposition doesn't contain edge: {:?}", edge_as_set);
             return false;
         }
     }
@@ -106,7 +104,7 @@ pub fn check_tree_decomposition<N, E, O, S: BuildHasher + Default>(
                             .collect();
 
                         // DEBUG
-                        error!("Between the vertex: {:?} \n 
+                        println!("Between the vertex: {:?} \n 
                     and vertex: {:?} \n 
                     the bags intersect with: {:?} \n 
                     however vertex {:?} along their path doesn't contain the following vertices: {:?} \n \n
@@ -119,12 +117,12 @@ pub fn check_tree_decomposition<N, E, O, S: BuildHasher + Default>(
                         {
                             // DEBUG
                             for node_index in vertices_missing_along_path {
-                                error!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
+                                println!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
                             }
 
                             // DEBUG
                             for node_index in path {
-                                error!(
+                                println!(
                                     "{:?} with level: {} and predecessor {:?} 
                             and bag {:?}",
                                     node_index,

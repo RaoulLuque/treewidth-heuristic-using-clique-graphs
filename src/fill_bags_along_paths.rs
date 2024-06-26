@@ -1,5 +1,4 @@
 use itertools::Itertools;
-use log::{debug, info};
 use petgraph::{graph::NodeIndex, Graph};
 use std::{
     cmp::Ordering,
@@ -88,24 +87,12 @@ pub fn fill_bags_along_paths_using_structure<E: Default + Debug, S: Default + Bu
     graph: &mut Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
     clique_graph_map: &HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
 ) -> HashMap<NodeIndex, (NodeIndex, usize), S> {
-    info!("Building tree structure");
-
     let mut tree_predecessor_map: HashMap<NodeIndex, (NodeIndex, usize), S> = Default::default();
     let root = graph
         .node_indices()
         .max_by_key(|v| graph.neighbors(*v).collect::<Vec<_>>().len())
         .expect("Graph shouldn't be empty");
     setup_predecessors(&graph, &mut tree_predecessor_map, root);
-
-    // DEBUG
-    debug!(
-        "Clique Tree Graph currently looks like this: {:?} \n",
-        graph
-    );
-    debug!(
-        "Predecessor map looks like this: {:?}",
-        tree_predecessor_map
-    );
 
     for vertex_in_initial_graph in clique_graph_map.keys() {
         fill_bags_until_common_predecessor(
@@ -117,12 +104,6 @@ pub fn fill_bags_along_paths_using_structure<E: Default + Debug, S: Default + Bu
                 .expect("key should exist by loop invariant"),
         )
     }
-
-    // DEBUG
-    debug!(
-        "Clique Tree Graph looks like this after filling up: {:?} \n",
-        graph
-    );
 
     tree_predecessor_map
 }
@@ -190,26 +171,14 @@ pub fn fill_bags_until_common_predecessor<E, S: BuildHasher>(
         }
     }
 
-    // DEBUG
-    debug!("Currently filling in {:?}", vertex_in_initial_graph);
-
     // Loop that looks at ancestor of vertex with highest level index in tree. Inserts the ancestors
     // in the predecessors, not inserting duplicates. If only one ancestor is left, the common ancestor is found.
     while predecessors.len() > 1 {
-        // DEBUG
-        debug!("Predecessors: {:?}", predecessors);
         // Current vertex should be the one with the highest level index in the tree
         let current_vertex_in_clique_graph = predecessors
             .pop_last()
             .expect("Collection shouldn't be empty by loop invariant");
-        //DEBUG
-        debug!("Current vertex: {:?}", current_vertex_in_clique_graph);
 
-        //DEBUG
-        debug!(
-            "Filling in {:?} into {:?}",
-            vertex_in_initial_graph, current_vertex_in_clique_graph
-        );
         // Insert the vertex from the original graph in the bag of the current vertex in the clique graph
         // that is on the path to the common ancestor
         clique_graph
@@ -224,25 +193,11 @@ pub fn fill_bags_until_common_predecessor<E, S: BuildHasher>(
                 node_index: *predecessor_clique_graph_vertex,
                 level_index: *index,
             };
-            // DEBUG
-            debug!(
-                "Current vertex is: {:?}, predecessor is: {:?}",
-                current_vertex_in_clique_graph, predecessor
-            );
             predecessors.insert(predecessor);
-            debug!(
-                "After inserting predecessor the predecessors look like this: {:?} \n \n",
-                predecessors
-            );
         }
     }
     // This is reached once the common ancestor is found and the only element left in the collection
     if let Some(common_predecessor) = predecessors.first() {
-        // DEBUG
-        debug!(
-            "Filling in vertex from initial graph: {:?} into common ancestor: {:?}",
-            vertex_in_initial_graph, common_predecessor
-        );
         clique_graph
             .node_weight_mut(common_predecessor.node_index)
             .expect("Bag for the vertex should exist")
