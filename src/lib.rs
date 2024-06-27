@@ -15,7 +15,7 @@ pub(crate) use check_tree_decomposition::check_tree_decomposition;
 pub use clique_graph_edge_weight_functions::*;
 pub use compute_treewidth_upper_bound::{
     compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
-    TreewidthComputationMethod,
+    SpanningTreeConstructionMethod,
 };
 pub(crate) use construct_clique_graph::{construct_clique_graph, construct_clique_graph_with_bags};
 pub(crate) use fill_bags_along_paths::{
@@ -75,10 +75,10 @@ pub(crate) mod tests {
         pub expected_connected_components: Vec<Vec<NodeIndex>>,
     }
 
-    pub const COMPUTATION_METHODS: [TreewidthComputationMethod; 3] = [
-        TreewidthComputationMethod::FillWhilstMST,
-        TreewidthComputationMethod::MSTAndFill,
-        TreewidthComputationMethod::MSTAndUseTreeStructure,
+    pub const COMPUTATION_METHODS: [SpanningTreeConstructionMethod; 3] = [
+        SpanningTreeConstructionMethod::FillWhilstMST,
+        SpanningTreeConstructionMethod::MSTAndFill,
+        SpanningTreeConstructionMethod::MSTAndUseTreeStructure,
     ];
 
     /// Sets up test graph:

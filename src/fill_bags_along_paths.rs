@@ -7,6 +7,8 @@ use std::{
     hash::BuildHasher,
 };
 
+/// Struct for keeping track of node_index (node identifier in the graph) and the level of the node
+/// in the rooted tree.
 #[derive(PartialEq, Eq, Debug)]
 struct Predecessor {
     node_index: NodeIndex,
@@ -83,6 +85,9 @@ pub fn fill_bags_along_paths<E, S: BuildHasher>(
 
 /// Given a tree graph with bags (HashSets) as Vertices, checks all 2-combinations of bags for non-empty-intersection
 /// and inserts the intersecting nodes in all bags that are along the (unique) path of the two bags in the tree.
+///
+/// This is done by identifying the tree with a rooted tree and therefore searching for paths of
+/// two vertices by searching for the common ancestor of these two vertices.
 pub fn fill_bags_along_paths_using_structure<E: Default + Debug, S: Default + BuildHasher>(
     graph: &mut Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
     clique_graph_map: &HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
@@ -109,7 +114,8 @@ pub fn fill_bags_along_paths_using_structure<E: Default + Debug, S: Default + Bu
 }
 
 /// Sets up the predecessor map such that each node has a predecessor going back to the root node.
-/// Additionally there is an index, indicating the depth level at which the predecessor is (root is 0)
+/// Additionally there is an index, indicating the depth level at which the predecessor is
+/// (root is 0, neighbours of root are 1 and so on ...).
 fn setup_predecessors<E, S: BuildHasher>(
     graph: &Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
     predecessors_map: &mut HashMap<NodeIndex, (NodeIndex, usize), S>,
@@ -141,16 +147,21 @@ fn setup_predecessors<E, S: BuildHasher>(
     );
 }
 
+/// Using the predecessor map, the common ancestor of the vertices_in_clique_graph is found and
+/// along all of the paths from the vertices_in_clique_graph to this common ancestor, the
+/// vertex_in_initial_graph is inserted.
 pub fn fill_bags_until_common_predecessor<E, S: BuildHasher>(
     clique_graph: &mut Graph<HashSet<NodeIndex, S>, E, petgraph::prelude::Undirected>,
     predecessors_map: &HashMap<NodeIndex, (NodeIndex, usize), S>,
     vertex_in_initial_graph: &NodeIndex,
     vertices_in_clique_graph: &HashSet<NodeIndex, S>,
 ) {
-    // TO DO ?
     // Maybe optimize by not filling up vertices_in_clique_graph, but inserting their predecessors already
     // NOTE: Keep in mind, that one of the vertices_in_clique_graph might be the greatest common ancestor,
     // so this can be done for all vertices_in_clique_graph that don't have the minimizing level (possible implementation)
+
+    // BTreeSet is used because it orders the Predecessors according to their level (when using get
+    // the predecessor with the highest level is returned).
     let mut predecessors: BTreeSet<Predecessor> = BTreeSet::new();
     if vertices_in_clique_graph.len() > 1 {
         for vertex_in_clique_graph in vertices_in_clique_graph {

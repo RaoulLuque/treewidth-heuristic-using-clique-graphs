@@ -43,10 +43,12 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
 
     while !clique_graph_remaining_vertices.is_empty() {
         // DEBUG
-        // println!(
-        //     "{} vertices remaining",
-        //     clique_graph_remaining_vertices.len()
-        // );
+        if clique_graph_remaining_vertices.len() % 30 == 0 {
+            println!(
+                "{} vertices remaining",
+                clique_graph_remaining_vertices.len()
+            );
+        }
 
         if current_treewidth != crate::find_width_of_tree_decomposition(&result_graph) {
             current_treewidth = crate::find_width_of_tree_decomposition(&result_graph);
@@ -72,25 +74,6 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
                 .expect("Vertices in clique graph should have bags as weights")
                 .clone(),
         );
-
-        // DEBUG
-        // println!(
-        //     "Number of vertices not in intersection with new vertex is: {} of total {}",
-        //     result_graph
-        //         .node_weight(cheapest_new_vertex_res)
-        //         .unwrap()
-        //         .len()
-        //         - result_graph
-        //             .node_weight(cheapest_old_vertex_res)
-        //             .unwrap()
-        //             .intersection(result_graph.node_weight(cheapest_new_vertex_res).unwrap())
-        //             .collect_vec()
-        //             .len(),
-        //     result_graph
-        //         .node_weight(cheapest_new_vertex_res)
-        //         .unwrap()
-        //         .len()
-        // );
 
         node_index_map.insert(cheapest_new_vertex_clique, cheapest_new_vertex_res);
         result_graph.add_edge(

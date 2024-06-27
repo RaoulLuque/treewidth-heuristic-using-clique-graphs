@@ -103,28 +103,26 @@ pub fn check_tree_decomposition<N, E, O, S: BuildHasher + Default>(
                             .difference(tree_decomposition_graph.node_weight(node_index).unwrap())
                             .collect();
 
-                        // DEBUG
                         println!("Between the vertex: {:?} \n 
-                    and vertex: {:?} \n 
-                    the bags intersect with: {:?} \n 
-                    however vertex {:?} along their path doesn't contain the following vertices: {:?} \n \n
+                                and vertex: {:?} \n 
+                                the bags intersect with: {:?} \n 
+                                however vertex {:?} along their path doesn't contain the following vertices: {:?} \n \n
 
-                    The full path is: {:?}",
-                    first_tuple, second_tuple, intersection_set, node_index, vertices_missing_along_path, path);
+                                The full path is: {:?}",
+                                first_tuple, second_tuple, intersection_set, node_index, vertices_missing_along_path, path
+                            );
 
                         if let (Some(predecessor_map), Some(clique_graph_map)) =
                             (predecessor_map, clique_graph_map)
                         {
-                            // DEBUG
                             for node_index in vertices_missing_along_path {
                                 println!("The intersecting vertex {:?} is contained in the following vertices in the clique graph: {:?}", node_index, clique_graph_map.get(&node_index).unwrap())
                             }
 
-                            // DEBUG
                             for node_index in path {
                                 println!(
                                     "{:?} with level: {} and predecessor {:?} 
-                            and bag {:?}",
+                                    and bag {:?}",
                                     node_index,
                                     match predecessor_map.get(&node_index) {
                                         Some(predecessor) => predecessor.1 + 1,

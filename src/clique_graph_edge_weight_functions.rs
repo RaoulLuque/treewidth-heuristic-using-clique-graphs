@@ -1,11 +1,12 @@
+use petgraph::graph::NodeIndex;
 use std::{collections::HashSet, hash::BuildHasher};
 
-use petgraph::graph::NodeIndex;
-
+/// Returns 0.
 pub fn neutral_heuristic<S>(_: &HashSet<NodeIndex, S>, _: &HashSet<NodeIndex, S>) -> i32 {
     0
 }
 
+/// Returns the negative of the cardinality of the intersection.
 pub fn negative_intersection<S: BuildHasher + Default>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,
@@ -16,6 +17,7 @@ pub fn negative_intersection<S: BuildHasher + Default>(
         .len() as i32)
 }
 
+/// Returns the cardinality of the intersection.
 pub fn positive_intersection<S: BuildHasher + Default>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,
@@ -26,6 +28,7 @@ pub fn positive_intersection<S: BuildHasher + Default>(
         .len() as i32
 }
 
+/// Returns the sum of the cardinalities (the sum of the disjoint union).
 pub fn disjoint_union<S: BuildHasher>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,
@@ -33,6 +36,7 @@ pub fn disjoint_union<S: BuildHasher>(
     (first_vertex.len() + second_vertex.len()) as i32
 }
 
+/// Returns the cardinality of the union (sum of the cardinalities - cardinality of intersection).
 pub fn union<S: BuildHasher + Default>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,
@@ -43,6 +47,7 @@ pub fn union<S: BuildHasher + Default>(
         .len() as i32
 }
 
+/// Returns the cardinality of the symmetric difference.
 pub fn least_difference<S: BuildHasher + Default>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,
@@ -53,6 +58,7 @@ pub fn least_difference<S: BuildHasher + Default>(
         .len() as i32
 }
 
+/// Returns a tuple with [negative_intersection] in the first and [least_difference] in the second entry
 pub fn negative_intersection_then_least_difference<S: BuildHasher + Default>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,
@@ -63,6 +69,7 @@ pub fn negative_intersection_then_least_difference<S: BuildHasher + Default>(
     )
 }
 
+/// Returns a tuple with [least_difference] in the first and [negative_intersection] in the second entry.
 pub fn least_difference_then_negative_intersection<S: BuildHasher + Default>(
     first_vertex: &HashSet<NodeIndex, S>,
     second_vertex: &HashSet<NodeIndex, S>,

@@ -4,12 +4,12 @@ use std::hash::BuildHasher;
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
 
-/// Constructs a clique graph given cliques of a graph.
-/// The clique graph consists of vertices which represent the cliques (bags)
-/// and edges that connect two vertices if the intersection of the corresponding cliques is not empty.
+/// Constructs the intersection graph of the given cliques (aka the clique graph if the set of
+/// cliques is the set of maximal cliques). The edge weights are determined according to the edge
+/// weight function.
 pub fn construct_clique_graph<InnerCollection, OuterIterator, O, S: Default + BuildHasher>(
     cliques: OuterIterator,
-    edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
+    edge_weight_function: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
 ) -> Graph<HashSet<NodeIndex, S>, O, petgraph::prelude::Undirected>
 where
     OuterIterator: IntoIterator<Item = InnerCollection>,
@@ -35,7 +35,7 @@ where
                     result_graph.add_edge(
                         vertex_index,
                         other_vertex_index,
-                        edge_weight_heuristic(this_vertex_weight, other_vertex_weight),
+                        edge_weight_function(this_vertex_weight, other_vertex_weight),
                     );
                 }
             }
@@ -45,12 +45,10 @@ where
     result_graph
 }
 
-/// Constructs a clique graph given cliques of a graph.
-/// The clique graph consists of vertices which represent the cliques (bags)
-/// and edges that connect two vertices if the intersection of the corresponding cliques is not empty.
+/// Constructs the same graph as [construct_clique_graph].
 ///
-/// Returns a tuple of the clique graph and a HashMap mapping the vertices in the original graph (the
-/// vertices from the bags) to HashSets containing the NodeIndices of all the Bags in the Clique Graph
+/// Additionally returns a HashMap mapping the vertices in the original graph (the
+/// vertices from the cliques) to HashSets containing the NodeIndices of all the Bags in the Clique Graph
 /// that contain the vertex from the original graph.
 pub fn construct_clique_graph_with_bags<
     InnerCollection,
@@ -104,6 +102,8 @@ where
     (result_graph, result_map)
 }
 
+/// Given a node from the original graph and a bag/vertex in the clique graph, adds this connection
+/// to the hashmap (node from original graph -> HashSet containing node from clique graph).
 fn add_node_index_to_bag_in_hashmap<S: Default + std::hash::BuildHasher>(
     map: &mut HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
     vertex_in_graph: NodeIndex,
