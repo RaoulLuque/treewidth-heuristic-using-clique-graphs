@@ -26,7 +26,7 @@ pub(crate) use fill_bags_while_generating_mst::{
     fill_bags_while_generating_mst_update_edges, fill_bags_while_generating_mst_using_tree,
 };
 pub(crate) use find_connected_components::find_connected_components;
-pub(crate) use find_maximum_cliques::{find_maximum_cliques, find_maximum_cliques_bounded};
+pub(crate) use find_maximum_cliques::{find_maximal_cliques, find_maximum_cliques_bounded};
 pub(crate) use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
 pub use generate_partial_k_tree::{
     generate_k_tree, generate_partial_k_tree, generate_partial_k_tree_with_guaranteed_treewidth,

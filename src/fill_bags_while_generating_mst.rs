@@ -3,8 +3,15 @@ use std::{
     hash::BuildHasher,
 };
 
+use log::trace;
 use petgraph::{graph::NodeIndex, Graph, Undirected};
 
+/// The function computes a [tree decomposition][https://en.wikipedia.org/wiki/Tree_decomposition]
+/// with the vertices having bags (HashSets) as labels
+/// given a clique graph. For this a minimum spanning tree of the clique graph is constructed using
+/// prim's algorithm and the edge labels in the clique graph as edge weights. Whenever a new vertex
+/// is added to the spanning tree, the bags of the current spanning tree are filled up/updated
+/// according to the [tree decomposition criteria][https://en.wikipedia.org/wiki/Tree_decomposition#Definition].
 pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + Clone>(
     clique_graph: &Graph<HashSet<NodeIndex, S>, O, Undirected>,
     edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
@@ -44,7 +51,7 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
     while !clique_graph_remaining_vertices.is_empty() {
         // DEBUG
         if clique_graph_remaining_vertices.len() % 30 == 0 {
-            println!(
+            trace!(
                 "{} vertices remaining",
                 clique_graph_remaining_vertices.len()
             );
@@ -179,6 +186,11 @@ fn fill_bags<O, S: BuildHasher>(
     }
 }
 
+/// Computes a tree decomposition similar to [fill_bags_while_generating_mst] except that whenever
+/// a vertex is added to the current spanning tree and the bags of the current spanning tree are
+/// filled up/updated, edges to other vertices in the entire clique graph are updated (in order to
+/// preserve the property that two vertices/bags in the clique graph are adjacent iff they have a
+/// non-empty intersection).
 pub fn fill_bags_while_generating_mst_update_edges<
     N,
     E,
@@ -315,7 +327,7 @@ fn fill_bags_from_result_graph_updating_edges<S: BuildHasher + Clone, O>(
     }
 }
 
-/// Adapted from fill_bags
+/// Adapted from [fill_bags]
 fn fill_bags_updating_edges<O, S: BuildHasher>(
     start_vertex: NodeIndex,
     end_vertex: NodeIndex,
@@ -493,6 +505,10 @@ pub fn fill_bags_while_generating_mst_using_tree<N, E, O: Ord, S: Default + Buil
     result_graph
 }
 
+/// Computes a tree decomposition similar to [fill_bags_while_generating_mst] except that instead of
+/// using edge weights in prim's algorithm, the weight of an edge (u,v) (v is not yet in the
+/// spanning tree) is the size of the biggest bag in the spanning tree if v was added to the
+/// spanning tree and the bags were filled up/updated accordingly.
 pub fn fill_bags_while_generating_mst_least_bag_size<
     N,
     E,

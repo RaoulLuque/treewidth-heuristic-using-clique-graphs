@@ -43,14 +43,14 @@ pub enum SpanningTreeConstructionMethod {
 /// a tree decomposition.
 ///
 /// See [TreewidthComputationMethod] for the different options of spanning tree construction.
-/// 
+///
 /// Also see [edge weight functions][crate::clique_graph_edge_weight_functions] for the different
 /// weight options for the edges in the clique graph.
 ///
-/// It is possible to not use the clique graph but the clique graph with a bound on the 
+/// It is possible to not use the clique graph but the clique graph with a bound on the
 /// size of the cliques instead. The resulting graph is the intersection graph of the set of all
 /// cliques that are maximal or have a size of clique_bound
-/// 
+///
 /// Can also check the tree decomposition for correctness after computation which will up to double
 /// the running time. If so, will panic if the tree decomposition if incorrect returning the vertices
 /// and path that is faulty.
@@ -79,7 +79,7 @@ pub fn compute_treewidth_upper_bound<
             // .sorted()
             .collect()
     } else {
-        find_maximum_cliques::<Vec<_>, _, S>(graph)
+        find_maximal_cliques::<Vec<_>, _, S>(graph)
             // .sorted()
             .collect()
     };

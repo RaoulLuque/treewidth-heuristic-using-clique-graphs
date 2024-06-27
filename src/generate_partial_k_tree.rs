@@ -4,17 +4,18 @@ use rand::{seq::IteratorRandom, Rng};
 
 use crate::maximum_minimum_degree_plus;
 
-/// Generates a [k-tree](https://en.wikipedia.org/wiki/K-tree) and then randomly removes p percent of the edges
-/// to get a [partial k-tree](https://en.wikipedia.org/wiki/Partial_k-tree). To guarantee a treewidth of k,
-/// this procedure is repeated until the treewidth of the graph is at least k according to the minimum
-/// maximum degree heuristic.
+/// Generates a [k-tree](https://en.wikipedia.org/wiki/K-tree) and then randomly removes p percent
+/// of the edges to get a [partial k-tree](https://en.wikipedia.org/wiki/Partial_k-tree). To
+/// guarantee a treewidth of k, this procedure is repeated until the treewidth of the graph is at
+/// least k according to the minimum maximum degree heuristic.
 ///
-/// **Caution!**: Due to the randomness involved, this function could in theory take indefinitely to generate
-/// a partial k-tree with the wished treewidth.
+/// **Caution!**: Due to the randomness involved, this function could in theory take
+/// indefinitely to generate a partial k-tree with the desired treewidth.
 ///
-/// If p > 100 all edges will be removed. The Rng is passed in to increase performance when calling the function multiple times in a row.
+/// If p > 100 all edges will be removed. The Rng is passed in to increase performance when
+/// calling the function multiple times in a row.
 ///
-/// Returns None if k > n
+/// Returns None if k > n.
 pub fn generate_partial_k_tree_with_guaranteed_treewidth(
     k: usize,
     n: usize,
@@ -37,10 +38,10 @@ pub fn generate_partial_k_tree_with_guaranteed_treewidth(
 /// If p > 100 all edges will be removed. The Rng is passed in to increase performance when calling
 /// the function multiple times in a row.
 ///
-/// Returns None if k > n
+/// Returns None if k > n.
 ///
-/// The number of edges in a k_tree are k * (k - 1) / 2 + k * (n - k). So the number of removed edges in a
-/// partial_k_tree will be (k * (k - 1) / 2 + k * (n - k)) * p / 100 rounded down
+/// The number of edges in a k_tree are k * (k - 1) / 2 + k * (n - k). So the number of removed
+/// edges in a partial_k_tree will be (k * (k - 1) / 2 + k * (n - k)) * p / 100 rounded down.
 pub fn generate_partial_k_tree(
     k: usize,
     n: usize,
@@ -67,7 +68,7 @@ pub fn generate_partial_k_tree(
 }
 
 /// Generates a [k-tree](https://en.wikipedia.org/wiki/K-tree) with n vertices and k in the definition.
-/// Returns None if k > n
+/// Returns None if k > n.
 pub fn generate_k_tree(k: usize, n: usize) -> Option<Graph<i32, i32, Undirected>> {
     if k > n {
         None

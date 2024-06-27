@@ -4,10 +4,11 @@ use std::hash::BuildHasher;
 use std::iter::from_fn;
 use std::{collections::HashSet, hash::Hash};
 
-/// Returns an iterator that produces all maximum cliques in the given graph in arbitrary order.
+/// Returns an iterator that produces all [maximal cliques][https://en.wikipedia.org/wiki/Clique_(graph_theory)#Definitions]
+/// in the given graph in arbitrary order.
 ///
-/// This algorithm is adapted from <https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.clique.find_cliques.html>.
-pub fn find_maximum_cliques<TargetColl, G, S: Default + BuildHasher + Clone>(
+/// This algorithm is adapted from [networkX find_cliques algorithm][https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.clique.find_cliques.html].
+pub fn find_maximal_cliques<TargetColl, G, S: Default + BuildHasher + Clone>(
     graph: G,
 ) -> impl Iterator<Item = TargetColl>
 where
@@ -110,8 +111,8 @@ where
     })
 }
 
-/// Returns an iterator that produces all maximum cliques with maximum size k or cliques that are
-/// part of maximum cliques that are themselves bigger in size than k in arbitrary order.
+/// Returns an iterator that produces (once each) all cliques that are [maximal][https://en.wikipedia.org/wiki/Clique_(graph_theory)#Definitions]
+/// (and of size less than k) or of size k (and not necessarily maximal) in arbitrary order.
 ///
 /// Uses the [find_maximum_cliques] method.
 pub fn find_maximum_cliques_bounded<TargetColl, G, S: Default + Clone + BuildHasher>(
@@ -126,7 +127,7 @@ where
     TargetColl: FromIterator<G::NodeId>,
     <G as GraphBase>::NodeId: 'static,
 {
-    let mut maximum_cliques = find_maximum_cliques::<HashSet<_, S>, G, S>(graph);
+    let mut maximum_cliques = find_maximal_cliques::<HashSet<_, S>, G, S>(graph);
     let mut combinations = HashSet::<_, S>::default().into_iter().combinations(k);
     let mut seen_combinations = HashSet::<_, S>::default();
     from_fn(move || loop {
@@ -160,7 +161,7 @@ mod tests {
             let test_graph = crate::tests::setup_test_graph(i);
 
             let mut cliques: Vec<Vec<_>> =
-                find_maximum_cliques::<Vec<_>, _, RandomState>(&test_graph.graph).collect();
+                find_maximal_cliques::<Vec<_>, _, RandomState>(&test_graph.graph).collect();
 
             for i in 0..cliques.len() {
                 cliques[i].sort();

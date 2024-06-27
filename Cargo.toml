@@ -12,3 +12,4 @@ petgraph = "0.6.4"
 itertools = "0.13"
 rand = "0.8.5"
 rustc-hash = { version ="2.0.0", git = "https://github.com/rust-lang/rustc-hash"}
+log = "0.4.21"
