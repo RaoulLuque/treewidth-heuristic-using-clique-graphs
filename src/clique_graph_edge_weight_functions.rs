@@ -1,9 +1,16 @@
 use petgraph::graph::NodeIndex;
+use rand::Rng;
 use std::{collections::HashSet, hash::BuildHasher};
 
 /// Returns 0.
-pub fn neutral_heuristic<S>(_: &HashSet<NodeIndex, S>, _: &HashSet<NodeIndex, S>) -> i32 {
+pub fn neutral<S>(_: &HashSet<NodeIndex, S>, _: &HashSet<NodeIndex, S>) -> i32 {
     0
+}
+
+/// Returns a random i32 integer
+pub fn random<S>(_: &HashSet<NodeIndex, S>, _: &HashSet<NodeIndex, S>) -> i32 {
+    let mut rng = rand::thread_rng();
+    rng.gen::<i32>()
 }
 
 /// Returns the negative of the cardinality of the intersection.
