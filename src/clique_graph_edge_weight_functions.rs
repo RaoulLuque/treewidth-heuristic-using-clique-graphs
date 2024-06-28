@@ -3,7 +3,7 @@ use rand::Rng;
 use std::{collections::HashSet, hash::BuildHasher};
 
 /// Returns 0.
-pub fn neutral<S>(_: &HashSet<NodeIndex, S>, _: &HashSet<NodeIndex, S>) -> i32 {
+pub fn constant<S>(_: &HashSet<NodeIndex, S>, _: &HashSet<NodeIndex, S>) -> i32 {
     0
 }
 

@@ -296,7 +296,7 @@ mod tests {
             let test_graph = setup_test_graph(i);
             let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState, _>(
                 &test_graph.graph,
-                neutral,
+                constant,
                 SpanningTreeConstructionMethod::MSTAndUseTreeStructure,
                 true,
                 None,
@@ -304,7 +304,7 @@ mod tests {
 
             let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState, _>(
                 &test_graph.graph,
-                neutral,
+                constant,
                 SpanningTreeConstructionMethod::MSTAndFill,
                 true,
                 None,
@@ -324,7 +324,7 @@ mod tests {
                         std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
                         _,
                     >(
-                        &test_graph.graph, neutral, computation_method, false, None
+                        &test_graph.graph, constant, computation_method, false, None
                     );
                 if !(i == 1
                     && (computation_method == SpanningTreeConstructionMethod::MSTAndFill
