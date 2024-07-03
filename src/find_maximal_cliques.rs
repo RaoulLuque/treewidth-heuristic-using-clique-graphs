@@ -115,7 +115,7 @@ where
 /// (and of size less than k) or of size k (and not necessarily maximal) in arbitrary order.
 ///
 /// Uses the [find_maximum_cliques] method.
-pub fn find_maximum_cliques_bounded<TargetColl, G, S: Default + Clone + BuildHasher>(
+pub fn find_maximal_cliques_bounded<TargetColl, G, S: Default + Clone + BuildHasher>(
     graph: G,
     k: usize,
 ) -> impl Iterator<Item = TargetColl>
@@ -181,7 +181,7 @@ mod tests {
         let test_graph = crate::tests::setup_test_graph(0);
 
         let mut cliques: Vec<Vec<_>> =
-            find_maximum_cliques_bounded::<Vec<_>, _, RandomState>(&test_graph.graph, 3).collect();
+            find_maximal_cliques_bounded::<Vec<_>, _, RandomState>(&test_graph.graph, 3).collect();
 
         for i in 0..cliques.len() {
             cliques[i].sort();
@@ -216,7 +216,7 @@ mod tests {
         let test_graph = crate::tests::setup_test_graph(2);
 
         let mut cliques: Vec<Vec<_>> =
-            find_maximum_cliques_bounded::<Vec<_>, _, RandomState>(&test_graph.graph, 3).collect();
+            find_maximal_cliques_bounded::<Vec<_>, _, RandomState>(&test_graph.graph, 3).collect();
 
         for i in 0..cliques.len() {
             cliques[i].sort();

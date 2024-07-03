@@ -79,7 +79,7 @@ pub fn compute_treewidth_upper_bound<
 ) {
     // Find cliques in initial graph
     let cliques: Vec<Vec<_>> = if let Some(k) = clique_bound {
-        find_maximum_cliques_bounded::<Vec<_>, _, S>(graph, k)
+        find_maximal_cliques_bounded::<Vec<_>, _, S>(graph, k)
             // .sorted()
             .collect()
     } else {
