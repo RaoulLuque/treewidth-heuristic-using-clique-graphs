@@ -4,7 +4,7 @@ mod compute_treewidth_upper_bound;
 pub mod construct_clique_graph;
 pub mod fill_bags_along_paths;
 mod fill_bags_while_generating_mst;
-mod find_connected_components;
+pub mod find_connected_components;
 pub mod find_maximal_cliques;
 pub mod find_width_of_tree_decomposition;
 mod generate_partial_k_tree;
