@@ -1,10 +1,9 @@
+use log::trace;
+use petgraph::{graph::NodeIndex, Graph, Undirected};
 use std::{
     collections::{HashMap, HashSet},
     hash::BuildHasher,
 };
-
-use log::trace;
-use petgraph::{graph::NodeIndex, Graph, Undirected};
 
 /// The function computes a [tree decomposition][https://en.wikipedia.org/wiki/Tree_decomposition]
 /// with the vertices having bags (HashSets) as labels
@@ -57,8 +56,15 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
             );
         }
 
-        if current_treewidth != crate::find_width_of_tree_decomposition(&result_graph) {
-            current_treewidth = crate::find_width_of_tree_decomposition(&result_graph);
+        if current_treewidth
+            != crate::find_width_of_tree_decomposition::find_width_of_tree_decomposition(
+                &result_graph,
+            )
+        {
+            current_treewidth =
+                crate::find_width_of_tree_decomposition::find_width_of_tree_decomposition(
+                    &result_graph,
+                );
             // DEBUG
             // println!("Max bagsize increased to: {}", current_treewidth + 1);
         }
@@ -636,6 +642,6 @@ fn find_vertex_that_minimizes_bag_size<O: Ord + Default + Clone, S: BuildHasher 
             );
 
             // Find treewidth (biggest bag size) of 
-            crate::find_width_of_tree_decomposition(&result_graph)
+            crate::find_width_of_tree_decomposition::find_width_of_tree_decomposition(&result_graph)
         }).expect("There should be interesting vertices since there are vertices left and the graph is connected")
 }

@@ -1,12 +1,12 @@
 mod check_tree_decomposition;
 mod clique_graph_edge_weight_functions;
 mod compute_treewidth_upper_bound;
-mod construct_clique_graph;
-mod fill_bags_along_paths;
+pub mod construct_clique_graph;
+pub mod fill_bags_along_paths;
 mod fill_bags_while_generating_mst;
 mod find_connected_components;
 mod find_maximum_cliques;
-mod find_width_of_tree_decomposition;
+pub mod find_width_of_tree_decomposition;
 mod generate_partial_k_tree;
 mod maximum_minimum_degree_heuristic;
 
@@ -17,17 +17,12 @@ pub use compute_treewidth_upper_bound::{
     compute_treewidth_upper_bound, compute_treewidth_upper_bound_not_connected,
     SpanningTreeConstructionMethod,
 };
-pub(crate) use construct_clique_graph::{construct_clique_graph, construct_clique_graph_with_bags};
-pub(crate) use fill_bags_along_paths::{
-    fill_bags_along_paths, fill_bags_along_paths_using_structure,
-};
 pub(crate) use fill_bags_while_generating_mst::{
     fill_bags_while_generating_mst, fill_bags_while_generating_mst_least_bag_size,
     fill_bags_while_generating_mst_update_edges, fill_bags_while_generating_mst_using_tree,
 };
 pub(crate) use find_connected_components::find_connected_components;
 pub(crate) use find_maximum_cliques::{find_maximal_cliques, find_maximum_cliques_bounded};
-pub(crate) use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
 pub use generate_partial_k_tree::{
     generate_k_tree, generate_partial_k_tree, generate_partial_k_tree_with_guaranteed_treewidth,
 };

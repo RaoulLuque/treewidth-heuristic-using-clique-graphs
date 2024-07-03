@@ -3,9 +3,12 @@ use std::{
     fmt::Debug,
     hash::BuildHasher,
 };
+use petgraph::{graph::NodeIndex, Graph, Undirected};
 
 use crate::*;
-use petgraph::{graph::NodeIndex, Graph, Undirected};
+use construct_clique_graph::*;
+use fill_bags_along_paths::*;
+use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
 
 /// Different methods for computing the spanning tree of the clique graph that is used as the base
 /// of the tree decomposition.
