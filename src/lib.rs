@@ -5,7 +5,7 @@ pub mod construct_clique_graph;
 pub mod fill_bags_along_paths;
 mod fill_bags_while_generating_mst;
 mod find_connected_components;
-mod find_maximum_cliques;
+pub mod find_maximal_cliques;
 pub mod find_width_of_tree_decomposition;
 mod generate_partial_k_tree;
 mod maximum_minimum_degree_heuristic;
@@ -22,7 +22,6 @@ pub(crate) use fill_bags_while_generating_mst::{
     fill_bags_while_generating_mst_update_edges, fill_bags_while_generating_mst_using_tree,
 };
 pub(crate) use find_connected_components::find_connected_components;
-pub(crate) use find_maximum_cliques::{find_maximal_cliques, find_maximum_cliques_bounded};
 pub use generate_partial_k_tree::{
     generate_k_tree, generate_partial_k_tree, generate_partial_k_tree_with_guaranteed_treewidth,
 };
