@@ -20,8 +20,13 @@ use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
 /// MSTAndUseTreeStructure Constructs a minimum spanning tree of the clique graph and fills up the
 /// bags afterwards trying to speed up filling up by using the tree structure
 ///
-/// FillWhilstMST Fill bags while constructing a spanning tree minimizing according to the edge
+/// FillWhilstMST Fills bags while constructing a spanning tree minimizing according to the edge
 /// heuristic
+/// 
+/// FillWhilstMSTAndLogBagSize Does the same computation as FillWhilstMST however tracks the size of the
+/// biggest bag every time a new vertex is added to the current spanning tree. The file
+/// k-tree-benchmarks/benchmark_results/k_tree_maximum_bag_size_over_time.csv (where k-tree-benchmarks
+/// is a subdirectory of the runtime directory) otherwise this option will panic.
 ///
 /// FillWhilstMSTEdgeUpdate Fill bags while constructing a spanning tree minimizing according to
 /// the edge heuristic. Updating adjacencies in clique graph according to bag updates
@@ -35,6 +40,7 @@ pub enum SpanningTreeConstructionMethod {
     MSTAndFill,
     MSTAndUseTreeStructure,
     FillWhilstMST,
+    FillWhilstMSTAndLogBagSize,
     FillWhilstMSTEdgeUpdate,
     FillWhilstMSTTree,
     FillWhilstMSTBagSize,
@@ -175,6 +181,24 @@ pub fn compute_treewidth_upper_bound<
                 &clique_graph,
                 edge_weight_function,
                 clique_graph_map,
+                false,
+            );
+
+            (clique_graph_tree, None, None, None, clique_graph)
+        }
+        SpanningTreeConstructionMethod::FillWhilstMSTAndLogBagSize => {
+            let (clique_graph, clique_graph_map) =
+                construct_clique_graph_with_bags(cliques, edge_weight_function);
+
+            let clique_graph_tree: Graph<
+                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                O,
+                petgraph::prelude::Undirected,
+            > = fill_bags_while_generating_mst::<N, E, O, S>(
+                &clique_graph,
+                edge_weight_function,
+                clique_graph_map,
+                true,
             );
 
             (clique_graph_tree, None, None, None, clique_graph)

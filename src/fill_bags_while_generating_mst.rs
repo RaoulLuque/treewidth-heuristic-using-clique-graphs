@@ -1,5 +1,7 @@
+use csv::WriterBuilder;
 use log::trace;
 use petgraph::{graph::NodeIndex, Graph, Undirected};
+use std::fs::File;
 use std::{
     collections::{HashMap, HashSet},
     hash::BuildHasher,
@@ -11,11 +13,22 @@ use std::{
 /// prim's algorithm and the edge labels in the clique graph as edge weights. Whenever a new vertex
 /// is added to the spanning tree, the bags of the current spanning tree are filled up/updated
 /// according to the [tree decomposition criteria][https://en.wikipedia.org/wiki/Tree_decomposition#Definition].
+///
+/// **Panics**
+/// The log_bag_size parameter enables logging of the increase in size of the biggest bag of the spanning
+/// tree over time while the spanning tree is constructed (i.e. for each new vertex added to the spanning
+/// tree, logs the current size of the biggest bag). If log_bag_size == true the file
+/// k-tree-benchmarks/benchmark_results/k_tree_maximum_bag_size_over_time.csv (where k-tree-benchmarks
+/// is a subdirectory of the runtime directory) has to exist otherwise this function will panic.
 pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + Clone>(
     clique_graph: &Graph<HashSet<NodeIndex, S>, O, Undirected>,
     edge_weight_heuristic: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
     clique_graph_map: HashMap<NodeIndex, HashSet<NodeIndex, S>, S>,
+    log_bag_size: bool,
 ) -> Graph<HashSet<NodeIndex, S>, O, Undirected> {
+    // For logging the size of the maximum bags. Stays empty if log_bag_size == False
+    let mut vector_for_logging = Vec::new();
+
     let mut result_graph: Graph<HashSet<NodeIndex, S>, O, Undirected> = Graph::new_undirected();
     // Maps the vertex indices from the clique graph to the corresponding vertex indices in the result graph
     let mut node_index_map: HashMap<NodeIndex, NodeIndex, S> = Default::default();
@@ -45,29 +58,16 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
     }
     node_index_map.insert(first_vertex_clique, first_vertex_res);
 
-    let mut current_treewidth = 0;
+    // Log current maximum bag size
+    if log_bag_size {
+        vector_for_logging.push(
+            crate::find_width_of_tree_decomposition::find_width_of_tree_decomposition(
+                &result_graph,
+            ),
+        );
+    }
 
     while !clique_graph_remaining_vertices.is_empty() {
-        // DEBUG
-        if clique_graph_remaining_vertices.len() % 30 == 0 {
-            trace!(
-                "{} vertices remaining",
-                clique_graph_remaining_vertices.len()
-            );
-        }
-
-        if current_treewidth
-            != crate::find_width_of_tree_decomposition::find_width_of_tree_decomposition(
-                &result_graph,
-            )
-        {
-            current_treewidth =
-                crate::find_width_of_tree_decomposition::find_width_of_tree_decomposition(
-                    &result_graph,
-                );
-            // DEBUG
-            // println!("Max bagsize increased to: {}", current_treewidth + 1);
-        }
         // The cheapest_old_vertex_res is one of the vertices from the already constructed tree that the new vertex
         // is being attached to
         // The cheapest_new_vertex_clique is the new vertex that is being added to the tree. The NodeIndex corresponds
@@ -119,6 +119,31 @@ pub fn fill_bags_while_generating_mst<N, E, O: Ord, S: Default + BuildHasher + C
             &clique_graph_map,
             &node_index_map,
         );
+
+        // Log current maximum bag size
+        vector_for_logging.push(
+            crate::find_width_of_tree_decomposition::find_width_of_tree_decomposition(
+                &result_graph,
+            ),
+        );
+    }
+
+    // Log bag size if log_bag_size == true
+    if log_bag_size {
+        let file = std::fs::OpenOptions::new()
+            .write(true)
+            .append(true)
+            .open("k-tree-benchmarks/benchmark_results/k_tree_maximum_bag_size_over_time.csv")
+            .unwrap();
+
+        let mut writer = WriterBuilder::new().flexible(false).from_writer(file);
+        let vector_for_logging = vector_for_logging.into_iter().map(|v| v.to_string());
+        writer
+            .write_record(vector_for_logging)
+            .expect("Writing to logs for maximum bag size for fill while should be possible");
+        writer
+            .flush()
+            .expect("Flushing logs for maximum bag size for fill while should be possible");
     }
 
     result_graph
