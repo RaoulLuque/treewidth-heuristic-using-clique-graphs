@@ -1,7 +1,5 @@
 use csv::WriterBuilder;
-use log::trace;
 use petgraph::{graph::NodeIndex, Graph, Undirected};
-use std::fs::File;
 use std::{
     collections::{HashMap, HashSet},
     hash::BuildHasher,

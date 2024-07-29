@@ -22,7 +22,7 @@ use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
 ///
 /// FillWhilstMST Fills bags while constructing a spanning tree minimizing according to the edge
 /// heuristic
-/// 
+///
 /// FillWhilstMSTAndLogBagSize Does the same computation as FillWhilstMST however tracks the size of the
 /// biggest bag every time a new vertex is added to the current spanning tree. The file
 /// k-tree-benchmarks/benchmark_results/k_tree_maximum_bag_size_over_time.csv (where k-tree-benchmarks
@@ -59,10 +59,11 @@ pub enum SpanningTreeConstructionMethod {
 ///
 /// It is possible to not use the clique graph but the clique graph with a bound on the
 /// size of the cliques instead. The resulting graph is the intersection graph of the set of all
-/// cliques that are maximal or have a size of clique_bound
+/// cliques that are maximal or have a size of clique_bound. For further information on this read the
+/// documentation of [find_maximal_cliques_bounded].
 ///
-/// Can also check the tree decomposition for correctness after computation which will up to double
-/// the running time. If so, will panic if the tree decomposition if incorrect returning the vertices
+/// Can also check the tree decomposition for correctness after computation which will on average at least double
+/// the running time. If so, will panic if the tree decomposition is incorrect returning the vertices
 /// and path that is faulty.
 pub fn compute_treewidth_upper_bound<
     N: Clone,
@@ -74,7 +75,7 @@ pub fn compute_treewidth_upper_bound<
     edge_weight_function: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
     treewidth_computation_method: SpanningTreeConstructionMethod,
     check_tree_decomposition_bool: bool,
-    clique_bound: Option<usize>,
+    clique_bound: Option<i32>,
 ) -> (
     Graph<HashSet<NodeIndex, S>, O, Undirected>,
     Graph<HashSet<NodeIndex, S>, O, Undirected>,
@@ -283,7 +284,7 @@ pub fn compute_treewidth_upper_bound_not_connected<
     edge_weight_function: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
     treewidth_computation_method: SpanningTreeConstructionMethod,
     check_tree_decomposition_bool: bool,
-    clique_bound: Option<usize>,
+    clique_bound: Option<i32>,
 ) -> usize {
     let components = find_connected_components::<Vec<_>, _, _, S>(graph);
     let mut computed_treewidth: usize = 0;
