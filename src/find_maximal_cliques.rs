@@ -130,12 +130,24 @@ where
     <G as GraphBase>::NodeId: 'static,
 {
     let maximal_cliques = find_maximal_cliques::<HashSet<_, S>, G, S>(graph);
-    let k = if k < 0 {
-        maximal_cliques
-            .max_by_key(|c| c.len())
-            .expect("The graph should not be empty")
-            .len()
-            + k as usize
+    let k = if k < 2 {
+        // If k is less than 2, either k is negative, in which case we want to set k = omega(G) + k.
+        // If k == 1, this is is invalid and we set k = 2.
+        if k == 1 {
+            2
+        } else {
+            // If k <= 0 and k < -omega(G), we set k = 2, because omega(G) + k is not a valid bound.
+            let k: i32 = maximal_cliques
+                .max_by_key(|c| c.len())
+                .expect("The graph should not be empty")
+                .len()
+                + k;
+            if k < 2 {
+                2
+            } else {
+                k as usize
+            }
+        }
     } else {
         k as usize
     };
