@@ -140,7 +140,7 @@ where
             let k: i32 = maximal_cliques
                 .max_by_key(|c| c.len())
                 .expect("The graph should not be empty")
-                .len()
+                .len() as i32
                 + k;
             if k < 2 {
                 2
