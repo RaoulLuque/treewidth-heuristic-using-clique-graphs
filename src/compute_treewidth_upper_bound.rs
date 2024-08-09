@@ -128,8 +128,6 @@ pub fn compute_treewidth_upper_bound<
         SpanningTreeConstructionMethod::MSTAndUseTreeStructure => {
             let (clique_graph, clique_graph_map) =
                 construct_clique_graph_with_bags(cliques, edge_weight_function);
-            // DEBUG
-            // println!("Initial clique graph: {:?}", clique_graph);
 
             let mut clique_graph_tree: Graph<
                 std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
@@ -139,21 +137,6 @@ pub fn compute_treewidth_upper_bound<
                 &clique_graph,
             ));
             let clique_graph_tree_before_filling = clique_graph_tree.clone();
-
-            // DEBUG
-            let clique_graph_tree_copy: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                O,
-                petgraph::prelude::Undirected,
-            > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
-                &clique_graph,
-            ));
-            assert!(petgraph::algo::is_isomorphic_matching(
-                &clique_graph_tree,
-                &clique_graph_tree_copy,
-                |a, b| a.eq(b),
-                |a, b| a.eq(b)
-            ));
 
             let predecessor_map =
                 fill_bags_along_paths_using_structure(&mut clique_graph_tree, &clique_graph_map);
