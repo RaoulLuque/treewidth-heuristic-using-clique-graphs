@@ -2,7 +2,7 @@
 
 A library implementing a heuristic for computing an upper bound for the treewidth of arbitrary graphs using the clique graph operator for my bachelor thesis.
 
-## Idea of heuristic
+## Idea of the heuristic
 The heuristic computes a tree decomposition of a given graph by using the clique graph operator. First the maximal cliques of the given graph are computed which in general can take exponential time (and space) in the size of the graph since a graph can have up to exponential number of maximal cliques, see Moon and Moser graph. From these maximal cliques, the intersection graph is computed, that is the clique graph of the original graph. For the heuristic identify the vertices in the clique graph with the maximal cliques they correspond to. Moreover we identify these maximal cliques with bags in a tree decomposition. Since a clique graph is in general not a tree, we compute a spanning tree of the clique graph. Afterwards we fill up all the necessary vertices in the bags by checking each pair of vertices/bags in the computed spanning tree and if they have a non-empty intersection, add this intersection to all bags along the path of the two vertices in the spanning tree. This way a tree decomposition is obtained.
 
 In pseudocode this can be described as following
