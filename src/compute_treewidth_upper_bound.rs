@@ -1,9 +1,5 @@
 use petgraph::{graph::NodeIndex, Graph, Undirected};
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Debug,
-    hash::BuildHasher,
-};
+use std::{collections::HashSet, fmt::Debug, hash::BuildHasher};
 
 use crate::*;
 use construct_clique_graph::*;
@@ -14,36 +10,36 @@ use find_width_of_tree_decomposition::find_width_of_tree_decomposition;
 /// Different methods for computing the spanning tree of the clique graph that is used as the base
 /// of the tree decomposition.
 ///
-/// MSTAndFill Constructs a minimum spanning tree of the clique graph and fills up the bags
+/// MSTre Constructs a minimum spanning tree of the clique graph and fills up the bags
 /// afterwards
 ///
-/// MSTAndUseTreeStructure Constructs a minimum spanning tree of the clique graph and fills up the
+/// MSTreIUseTr Constructs a minimum spanning tree of the clique graph and fills up the
 /// bags afterwards trying to speed up filling up by using the tree structure
 ///
-/// FillWhilstMST Fills bags while constructing a spanning tree minimizing according to the edge
+/// FilWh Fills bags while constructing a spanning tree minimizing according to the edge
 /// heuristic
 ///
-/// FillWhilstMSTAndLogBagSize Does the same computation as FillWhilstMST however tracks the size of the
+/// FilWhILogBagSize Does the same computation as FillWhilstMST however tracks the size of the
 /// biggest bag every time a new vertex is added to the current spanning tree. The file
 /// k-tree-benchmarks/benchmark_results/k_tree_maximum_bag_size_over_time.csv (where k-tree-benchmarks
 /// is a subdirectory of the runtime directory) otherwise this option will panic.
 ///
-/// FillWhilstMSTEdgeUpdate Fill bags while constructing a spanning tree minimizing according to
+/// FWhUE Fill bags while constructing a spanning tree minimizing according to
 /// the edge heuristic. Updating adjacencies in clique graph according to bag updates
 ///
-/// FillWhilstMSTTree Fill bags while constructing a spanning tree minimizing according to the
+/// FilWhIUseTr Fill bags while constructing a spanning tree minimizing according to the
 /// edge heuristic trying to speed up filling up by using the tree structure
 ///
-/// FillWhilstMSTBagSize Fills bags while constructing a spanning tree of the clique graph trying to minimize the maximum bag size in each step
+/// FWBag Fills bags while constructing a spanning tree of the clique graph trying to minimize the maximum bag size in each step
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SpanningTreeConstructionMethod {
-    MSTAndFill,
-    MSTAndUseTreeStructure,
-    FillWhilstMST,
-    FillWhilstMSTAndLogBagSize,
-    FillWhilstMSTEdgeUpdate,
-    FillWhilstMSTTree,
-    FillWhilstMSTBagSize,
+    MSTre,
+    MSTreIUseTr,
+    FilWh,
+    FilWhILogBagSize,
+    FWhUE,
+    FilWhIUseTr,
+    FWBag,
 }
 
 /// Computes an upper bound for the treewidth using the clique graph operator.
@@ -52,7 +48,7 @@ pub enum SpanningTreeConstructionMethod {
 /// tree on the constructed clique graph. Then the bags are filled up to satisfy the properties of
 /// a tree decomposition.
 ///
-/// See [TreewidthComputationMethod] for the different options of spanning tree construction.
+/// See [SpanningTreeConstructionMethod] for the different options of spanning tree construction.
 ///
 /// Also see [edge weight functions][crate::clique_graph_edge_weight_functions] for the different
 /// weight options for the edges in the clique graph.
@@ -76,14 +72,7 @@ pub fn compute_treewidth_upper_bound<
     treewidth_computation_method: SpanningTreeConstructionMethod,
     check_tree_decomposition_bool: bool,
     clique_bound: Option<i32>,
-) -> (
-    Graph<HashSet<NodeIndex, S>, O, Undirected>,
-    Graph<HashSet<NodeIndex, S>, O, Undirected>,
-    Option<Graph<HashSet<NodeIndex, S>, O, Undirected>>,
-    Option<HashMap<NodeIndex, (NodeIndex, usize), S>>,
-    Option<HashMap<NodeIndex, HashSet<NodeIndex, S>, S>>,
-    usize,
-) {
+) -> usize {
     // Find cliques in initial graph
     let cliques: Vec<Vec<_>> = if let Some(k) = clique_bound {
         find_maximal_cliques_bounded::<Vec<_>, _, S>(graph, k)
@@ -95,142 +84,129 @@ pub fn compute_treewidth_upper_bound<
             .collect()
     };
 
-    let (
-        clique_graph_tree_after_filling_up,
-        clique_graph_map,
-        predecessor_map,
-        clique_graph_tree_before_filling,
-        clique_graph,
-    ) = match treewidth_computation_method {
-        SpanningTreeConstructionMethod::MSTAndFill => {
-            let clique_graph: Graph<_, _, _> =
-                construct_clique_graph(cliques, edge_weight_function);
+    let (clique_graph_tree_after_filling_up, clique_graph_map, predecessor_map) =
+        match treewidth_computation_method {
+            SpanningTreeConstructionMethod::MSTre => {
+                let clique_graph: Graph<_, _, _> =
+                    construct_clique_graph(cliques, edge_weight_function);
 
-            let mut clique_graph_tree: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                O,
-                petgraph::prelude::Undirected,
-            > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
-                &clique_graph,
-            ));
-            let clique_graph_tree_before_filling = clique_graph_tree.clone();
+                let mut clique_graph_tree: Graph<
+                    std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                    O,
+                    petgraph::prelude::Undirected,
+                > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
+                    &clique_graph,
+                ));
 
-            fill_bags_along_paths(&mut clique_graph_tree);
+                fill_bags_along_paths(&mut clique_graph_tree);
 
-            (
-                clique_graph_tree,
-                None,
-                None,
-                Some(clique_graph_tree_before_filling),
-                clique_graph,
-            )
-        }
-        SpanningTreeConstructionMethod::MSTAndUseTreeStructure => {
-            let (clique_graph, clique_graph_map) =
-                construct_clique_graph_with_bags(cliques, edge_weight_function);
+                (clique_graph_tree, None, None)
+            }
+            SpanningTreeConstructionMethod::MSTreIUseTr => {
+                let (clique_graph, clique_graph_map) =
+                    construct_clique_graph_with_bags(cliques, edge_weight_function);
 
-            let mut clique_graph_tree: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                O,
-                petgraph::prelude::Undirected,
-            > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
-                &clique_graph,
-            ));
-            let clique_graph_tree_before_filling = clique_graph_tree.clone();
+                let mut clique_graph_tree: Graph<
+                    std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                    O,
+                    petgraph::prelude::Undirected,
+                > = petgraph::data::FromElements::from_elements(petgraph::algo::min_spanning_tree(
+                    &clique_graph,
+                ));
 
-            let predecessor_map =
-                fill_bags_along_paths_using_structure(&mut clique_graph_tree, &clique_graph_map);
+                let predecessor_map = fill_bags_along_paths_using_structure(
+                    &mut clique_graph_tree,
+                    &clique_graph_map,
+                );
 
-            (
-                clique_graph_tree,
-                Some(clique_graph_map),
-                Some(predecessor_map),
-                Some(clique_graph_tree_before_filling),
-                clique_graph,
-            )
-        }
-        SpanningTreeConstructionMethod::FillWhilstMST => {
-            let (clique_graph, clique_graph_map) =
-                construct_clique_graph_with_bags(cliques, edge_weight_function);
+                (
+                    clique_graph_tree,
+                    Some(clique_graph_map),
+                    Some(predecessor_map),
+                )
+            }
+            SpanningTreeConstructionMethod::FilWh => {
+                let (clique_graph, clique_graph_map) =
+                    construct_clique_graph_with_bags(cliques, edge_weight_function);
 
-            let clique_graph_tree: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                O,
-                petgraph::prelude::Undirected,
-            > = fill_bags_while_generating_mst::<N, E, O, S>(
-                &clique_graph,
-                edge_weight_function,
-                clique_graph_map,
-                false,
-            );
+                let clique_graph_tree: Graph<
+                    std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                    O,
+                    petgraph::prelude::Undirected,
+                > = fill_bags_while_generating_mst::<N, E, O, S>(
+                    &clique_graph,
+                    edge_weight_function,
+                    clique_graph_map,
+                    false,
+                );
 
-            (clique_graph_tree, None, None, None, clique_graph)
-        }
-        SpanningTreeConstructionMethod::FillWhilstMSTAndLogBagSize => {
-            let (clique_graph, clique_graph_map) =
-                construct_clique_graph_with_bags(cliques, edge_weight_function);
+                (clique_graph_tree, None, None)
+            }
+            SpanningTreeConstructionMethod::FilWhILogBagSize => {
+                let (clique_graph, clique_graph_map) =
+                    construct_clique_graph_with_bags(cliques, edge_weight_function);
 
-            let clique_graph_tree: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                O,
-                petgraph::prelude::Undirected,
-            > = fill_bags_while_generating_mst::<N, E, O, S>(
-                &clique_graph,
-                edge_weight_function,
-                clique_graph_map,
-                true,
-            );
+                let clique_graph_tree: Graph<
+                    std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                    O,
+                    petgraph::prelude::Undirected,
+                > = fill_bags_while_generating_mst::<N, E, O, S>(
+                    &clique_graph,
+                    edge_weight_function,
+                    clique_graph_map,
+                    true,
+                );
 
-            (clique_graph_tree, None, None, None, clique_graph)
-        }
-        SpanningTreeConstructionMethod::FillWhilstMSTEdgeUpdate => {
-            let (clique_graph, clique_graph_map) =
-                construct_clique_graph_with_bags(cliques, edge_weight_function);
+                (clique_graph_tree, None, None)
+            }
+            SpanningTreeConstructionMethod::FWhUE => {
+                let (clique_graph, clique_graph_map) =
+                    construct_clique_graph_with_bags(cliques, edge_weight_function);
 
-            let clique_graph_tree: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                O,
-                petgraph::prelude::Undirected,
-            > = fill_bags_while_generating_mst_update_edges::<N, E, O, S>(
-                &clique_graph,
-                edge_weight_function,
-                clique_graph_map,
-            );
+                let clique_graph_tree: Graph<
+                    std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                    O,
+                    petgraph::prelude::Undirected,
+                > = fill_bags_while_generating_mst_update_edges::<N, E, O, S>(
+                    &clique_graph,
+                    edge_weight_function,
+                    clique_graph_map,
+                );
 
-            (clique_graph_tree, None, None, None, clique_graph)
-        }
-        SpanningTreeConstructionMethod::FillWhilstMSTTree => {
-            let (clique_graph, clique_graph_map) =
-                construct_clique_graph_with_bags(cliques, edge_weight_function);
+                (clique_graph_tree, None, None)
+            }
+            SpanningTreeConstructionMethod::FilWhIUseTr => {
+                let (clique_graph, clique_graph_map) =
+                    construct_clique_graph_with_bags(cliques, edge_weight_function);
 
-            let clique_graph_tree: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                O,
-                petgraph::prelude::Undirected,
-            > = fill_bags_while_generating_mst_using_tree::<N, E, O, S>(
-                &clique_graph,
-                edge_weight_function,
-                clique_graph_map,
-            );
+                let clique_graph_tree: Graph<
+                    std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                    O,
+                    petgraph::prelude::Undirected,
+                > = fill_bags_while_generating_mst_using_tree::<N, E, O, S>(
+                    &clique_graph,
+                    edge_weight_function,
+                    clique_graph_map,
+                );
 
-            (clique_graph_tree, None, None, None, clique_graph)
-        }
-        SpanningTreeConstructionMethod::FillWhilstMSTBagSize => {
-            let (clique_graph, clique_graph_map) =
-                construct_clique_graph_with_bags(cliques, edge_weight_function);
+                (clique_graph_tree, None, None)
+            }
+            SpanningTreeConstructionMethod::FWBag => {
+                let (clique_graph, clique_graph_map) =
+                    construct_clique_graph_with_bags(cliques, edge_weight_function);
 
-            let clique_graph_tree: Graph<
-                std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
-                O,
-                petgraph::prelude::Undirected,
-            > = fill_bags_while_generating_mst_least_bag_size::<N, E, O, S>(
-                &clique_graph,
-                clique_graph_map,
-            );
+                let clique_graph_tree: Graph<
+                    std::collections::HashSet<petgraph::prelude::NodeIndex, S>,
+                    O,
+                    petgraph::prelude::Undirected,
+                > = fill_bags_while_generating_mst_least_bag_size::<N, E, O, S>(
+                    &clique_graph,
+                    clique_graph_map,
+                );
 
-            (clique_graph_tree, None, None, None, clique_graph)
-        }
-    };
+                (clique_graph_tree, None, None)
+            }
+        };
 
     if check_tree_decomposition_bool {
         assert!(
@@ -245,23 +221,16 @@ pub fn compute_treewidth_upper_bound<
     }
     let treewidth = find_width_of_tree_decomposition(&clique_graph_tree_after_filling_up);
 
-    (
-        clique_graph,
-        clique_graph_tree_after_filling_up,
-        clique_graph_tree_before_filling,
-        predecessor_map,
-        clique_graph_map,
-        treewidth,
-    )
+    treewidth
 }
 
 /// Computes an upper bound for the treewidth returning the maximum [compute_treewidth_upper_bound] on the
 /// components
 pub fn compute_treewidth_upper_bound_not_connected<
-    N: Clone,
-    E: Clone,
-    S: Default + BuildHasher + Clone,
+    N: Clone + Debug,
+    E: Clone + Debug,
     O: Clone + Ord + Default + Debug,
+    S: Default + BuildHasher + Clone,
 >(
     graph: &Graph<N, E, Undirected>,
     edge_weight_function: fn(&HashSet<NodeIndex, S>, &HashSet<NodeIndex, S>) -> O,
@@ -273,19 +242,19 @@ pub fn compute_treewidth_upper_bound_not_connected<
     let mut computed_treewidth: usize = 0;
 
     for component in components {
+        println!("Test");
         let mut subgraph = graph.clone();
         subgraph.retain_nodes(|_, v| component.contains(&v));
 
-        computed_treewidth = computed_treewidth.max(
-            compute_treewidth_upper_bound(
-                &subgraph,
-                edge_weight_function,
-                treewidth_computation_method,
-                check_tree_decomposition_bool,
-                clique_bound,
-            )
-            .5,
-        );
+        println!("Graph: {:?} \n Subgraph: {:?}", graph, subgraph);
+
+        computed_treewidth = computed_treewidth.max(compute_treewidth_upper_bound(
+            &subgraph,
+            edge_weight_function,
+            treewidth_computation_method,
+            check_tree_decomposition_bool,
+            clique_bound,
+        ));
     }
 
     computed_treewidth
@@ -302,18 +271,18 @@ mod tests {
     fn test_treewidth_heuristic_check_tree_decomposition() {
         for i in 0..3 {
             let test_graph = setup_test_graph(i);
-            let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState, _>(
+            let _ = compute_treewidth_upper_bound_not_connected::<_, _, _, RandomState>(
                 &test_graph.graph,
                 constant,
-                SpanningTreeConstructionMethod::MSTAndUseTreeStructure,
+                SpanningTreeConstructionMethod::MSTreIUseTr,
                 true,
                 None,
             );
 
-            let _ = compute_treewidth_upper_bound_not_connected::<_, _, RandomState, _>(
+            let _ = compute_treewidth_upper_bound_not_connected::<_, _, _, RandomState>(
                 &test_graph.graph,
                 constant,
-                SpanningTreeConstructionMethod::MSTAndFill,
+                SpanningTreeConstructionMethod::MSTre,
                 true,
                 None,
             );
@@ -329,18 +298,16 @@ mod tests {
                     compute_treewidth_upper_bound_not_connected::<
                         _,
                         _,
-                        std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
                         _,
+                        std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
                     >(
                         &test_graph.graph, constant, computation_method, false, None
                     );
                 if !(i == 1
-                    && (computation_method == SpanningTreeConstructionMethod::MSTAndFill
-                        || computation_method
-                            == SpanningTreeConstructionMethod::MSTAndUseTreeStructure))
+                    && (computation_method == SpanningTreeConstructionMethod::MSTre
+                        || computation_method == SpanningTreeConstructionMethod::MSTreIUseTr))
                 {
-                    if i == 1 && computation_method == SpanningTreeConstructionMethod::FillWhilstMST
-                    {
+                    if i == 1 && computation_method == SpanningTreeConstructionMethod::FilWh {
                         assert_eq!(computed_treewidth, 4);
                     } else {
                         assert_eq!(
@@ -362,8 +329,8 @@ mod tests {
                 let computed_treewidth = compute_treewidth_upper_bound_not_connected::<
                     _,
                     _,
-                    std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
                     _,
+                    std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
                 >(
                     &test_graph.graph,
                     negative_intersection,
@@ -372,9 +339,8 @@ mod tests {
                     None,
                 );
                 if !(i == 1
-                    && (computation_method == SpanningTreeConstructionMethod::MSTAndFill
-                        || computation_method
-                            == SpanningTreeConstructionMethod::MSTAndUseTreeStructure))
+                    && (computation_method == SpanningTreeConstructionMethod::MSTre
+                        || computation_method == SpanningTreeConstructionMethod::MSTreIUseTr))
                 {
                     assert_eq!(
                         computed_treewidth, test_graph.treewidth,
@@ -389,14 +355,14 @@ mod tests {
     #[test]
     fn negative_intersection_weight_heuristic_does_not_fail_on_first_test_graph() {
         let i = 1;
-        let computation_method = SpanningTreeConstructionMethod::MSTAndUseTreeStructure;
+        let computation_method = SpanningTreeConstructionMethod::MSTreIUseTr;
 
         let test_graph = setup_test_graph(i);
         let computed_treewidth = compute_treewidth_upper_bound_not_connected::<
             _,
             _,
-            std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
             _,
+            std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
         >(
             &test_graph.graph,
             negative_intersection,
@@ -419,8 +385,8 @@ mod tests {
                 let computed_treewidth = compute_treewidth_upper_bound_not_connected::<
                     _,
                     _,
-                    std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
                     _,
+                    std::hash::BuildHasherDefault<rustc_hash::FxHasher>,
                 >(
                     &test_graph.graph,
                     least_difference,
@@ -431,5 +397,21 @@ mod tests {
                 assert_eq!(computed_treewidth, test_graph.treewidth);
             }
         }
+    }
+
+    #[test]
+    fn test_treewidth_heuristic_does_not_panic() {
+        let graph =
+            petgraph::graph::UnGraph::<i32, ()>::from_edges(&[(0, 1), (1, 2), (2, 3), (3, 0)]);
+
+        let treewidth_upper_bound = compute_treewidth_upper_bound::<_, _, _, std::hash::RandomState>(
+            &graph,
+            negative_intersection,
+            SpanningTreeConstructionMethod::FilWh,
+            false,
+            None,
+        );
+
+        assert_eq!(treewidth_upper_bound, 2);
     }
 }

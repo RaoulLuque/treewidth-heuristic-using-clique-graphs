@@ -48,6 +48,8 @@ pub(crate) use hashset;
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use std::fmt::Debug;
+
     use petgraph::{graph::NodeIndex, Graph};
 
     use super::*;
@@ -65,14 +67,13 @@ pub(crate) mod tests {
         pub graph: Graph<i32, i32, petgraph::prelude::Undirected>,
         pub treewidth: usize,
         pub expected_max_cliques: Vec<Vec<NodeIndex>>,
-        pub max_min_degree: usize,
         pub expected_connected_components: Vec<Vec<NodeIndex>>,
     }
 
     pub const COMPUTATION_METHODS: [SpanningTreeConstructionMethod; 3] = [
-        SpanningTreeConstructionMethod::FillWhilstMST,
-        SpanningTreeConstructionMethod::MSTAndFill,
-        SpanningTreeConstructionMethod::MSTAndUseTreeStructure,
+        SpanningTreeConstructionMethod::FilWh,
+        SpanningTreeConstructionMethod::MSTre,
+        SpanningTreeConstructionMethod::MSTreIUseTr,
     ];
 
     /// Sets up test graph:
@@ -158,7 +159,6 @@ pub(crate) mod tests {
                     graph,
                     treewidth: 3,
                     expected_max_cliques,
-                    max_min_degree: 3,
                     expected_connected_components,
                 }
             }
@@ -219,7 +219,6 @@ pub(crate) mod tests {
                     graph,
                     treewidth: 3,
                     expected_max_cliques,
-                    max_min_degree: 3,
                     expected_connected_components,
                 }
             }
@@ -277,7 +276,6 @@ pub(crate) mod tests {
                     graph,
                     treewidth: 3,
                     expected_max_cliques,
-                    max_min_degree: 3,
                     expected_connected_components,
                 }
             }
@@ -306,7 +304,7 @@ pub(crate) mod tests {
         debug_assert!(test);
     }
 
-    fn test_graph_on_all_heuristics<N: Clone, E: Clone>(
+    fn test_graph_on_all_heuristics<N: Clone + Debug, E: Clone + Debug>(
         graph: Graph<N, E, petgraph::prelude::Undirected>,
         expected_treewidth: usize,
         msg: &str,
