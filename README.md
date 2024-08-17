@@ -18,6 +18,8 @@ def clique_graph_treewidth_heuristic(graph):
 ```
 where the last step just computes the largest bag size and subtracts 1 from it according to the definition of the width of a tree decomposition.
 
+The full explanation including other insights into the heuristic can be found in my [bachelor thesis](Bachelor_Thesis.pdf).
+
 ## Usage
 
 This crate mainly provides `compute_treewidth_upper_bound` and `compute_treewidth_upper_bound_not_connected` as functions.
